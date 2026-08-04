@@ -1,0 +1,2 @@
+# Normaliza fim de linha para LF no subtree web/ (evita ruído CRLF no Windows).
+* text=auto eol=lf
