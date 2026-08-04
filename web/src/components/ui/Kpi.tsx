@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Delta } from './Pill'
 
 type KpiProps = {
-  label: string
+  label: ReactNode
   value: ReactNode
   icon?: ReactNode
   delta?: { dir: 'up' | 'down'; text: string }

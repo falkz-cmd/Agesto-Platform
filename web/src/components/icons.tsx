@@ -111,3 +111,28 @@ export const IconClock = (p: IconProps) => (
     <path d="M12 7v5l3 2" />
   </Svg>
 )
+
+export const IconDollar = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+  </Svg>
+)
+
+export const IconTrendUp = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 3v18h18" />
+    <path d="M7 14l4-4 3 2 5-6" />
+  </Svg>
+)
+
+export const IconCheck = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20 6 9 17l-5-5" />
+  </Svg>
+)
+
+export const IconLines = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 6h18M3 12h18M3 18h12" />
+  </Svg>
+)
