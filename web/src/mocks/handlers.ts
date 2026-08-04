@@ -4,6 +4,7 @@ import { ok, fail } from './lib/http'
 import { dashboardMock, ultimosAtendimentosMock } from './data/dashboard'
 import { DEMO_EMAIL, DEMO_SENHA, buildMockJwt } from './data/auth'
 import { clienteHandlers } from './data/clientes'
+import { produtoHandlers } from './data/produtos'
 
 /**
  * Handlers do MSW. O `*` casa com qualquer origem, então funciona
@@ -32,4 +33,5 @@ export const handlers = [
 
   // Cadastros (CRUD stateful)
   ...clienteHandlers,
+  ...produtoHandlers,
 ]
