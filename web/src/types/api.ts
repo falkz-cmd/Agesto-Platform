@@ -163,6 +163,49 @@ export interface ServicoInput {
   valorEmpreitada?: number | null
 }
 
+/* ---------- Orçamento ---------- */
+
+export type StatusOrcamento = 'Rascunho' | 'Enviado' | 'Aprovado' | 'Recusado'
+
+export interface ItemOrcamento {
+  id: number
+  produtoId: number | null
+  servicoId: number | null
+  descricao: string | null
+  quantidade: number
+  precoUnitario: number
+  subtotal: number
+  custo: number | null
+}
+
+export interface Orcamento {
+  id: number
+  uuid: string
+  clienteId: number
+  status: StatusOrcamento
+  valorTotal: number
+  dataRegistro: string
+  atendimentoConvertidoId: number | null
+  createdAt: string
+  updatedAt: string
+  itens: ItemOrcamento[]
+}
+
+export interface ItemOrcamentoInput {
+  produtoId?: number | null
+  servicoId?: number | null
+  descricao?: string | null
+  quantidade: number
+  precoUnitario: number
+  custo?: number | null
+}
+
+export interface OrcamentoInput {
+  clienteId: number
+  status: StatusOrcamento
+  itens: ItemOrcamentoInput[]
+}
+
 /* ---------- Atendimento (para a tabela "últimos atendimentos") ---------- */
 
 export type StatusAtendimento = 'Pendente' | 'Concluido' | 'Cancelado'

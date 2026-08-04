@@ -7,6 +7,7 @@ import { clienteHandlers } from './data/clientes'
 import { produtoHandlers } from './data/produtos'
 import { servicoHandlers } from './data/servicos'
 import { agendaHandlers } from './data/agenda'
+import { orcamentoHandlers } from './data/orcamentos'
 
 /**
  * Handlers do MSW. O `*` casa com qualquer origem, então funciona
@@ -40,4 +41,5 @@ export const handlers = [
   ...clienteHandlers,
   ...produtoHandlers,
   ...servicoHandlers,
+  ...orcamentoHandlers,
 ]
