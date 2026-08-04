@@ -31,19 +31,20 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   const res = await fetch(`${BASE}${path}`, { ...init, headers })
 
-  if (res.status === 401) {
-    clearToken()
-    if (window.location.pathname !== '/login') {
-      window.location.assign('/login')
-    }
-    throw new ApiError(401, 'Sessão expirada. Faça login novamente.')
-  }
-
   let body: ApiResponse<T> | null = null
   try {
     body = (await res.json()) as ApiResponse<T>
   } catch {
     body = null
+  }
+
+  // 401 com token = sessão expirada -> limpa e volta pro login.
+  // No login não há token; ali 401 significa credenciais inválidas (mensagem do corpo).
+  if (res.status === 401 && token) {
+    clearToken()
+    if (window.location.pathname !== '/login') {
+      window.location.assign('/login')
+    }
   }
 
   if (!res.ok || !body?.success) {

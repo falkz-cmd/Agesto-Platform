@@ -1,7 +1,12 @@
 import { NavLink } from 'react-router-dom'
 import { NAV } from './nav'
+import { useAuth } from '../auth/useAuth'
 
 export function Sidebar() {
+  const { user, logout } = useAuth()
+  const email = user?.email ?? ''
+  const initial = email ? email[0]!.toUpperCase() : '—'
+
   return (
     <aside className="sticky top-0 flex h-screen w-[238px] flex-none flex-col gap-[5px] border-r border-line bg-surface px-[14px] py-[18px] max-[820px]:hidden">
       {/* Marca */}
@@ -50,15 +55,36 @@ export function Sidebar() {
         </div>
       ))}
 
-      {/* Rodapé — conta (será ligada à autenticação na web-04) */}
+      {/* Rodapé — conta autenticada */}
       <div className="mt-auto flex items-center gap-2.5 border-t border-line-2 p-2.5">
-        <div className="grid h-8 w-8 place-items-center rounded-[9px] bg-ink-3 text-[12px] font-bold text-white">
-          —
+        <div className="grid h-8 w-8 place-items-center rounded-[9px] bg-brand text-[12px] font-bold text-white">
+          {initial}
         </div>
-        <div>
-          <div className="text-[13px] font-semibold text-ink">Minha conta</div>
-          <div className="text-[11px] text-ink-4">Dono</div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-semibold text-ink">
+            {email || 'Minha conta'}
+          </div>
+          <div className="text-[11px] text-ink-4">{user?.perfil ?? 'Dono'}</div>
         </div>
+        <button
+          type="button"
+          onClick={logout}
+          aria-label="Sair"
+          title="Sair"
+          className="grid h-8 w-8 flex-none place-items-center rounded-[9px] text-ink-4 transition hover:bg-surface-2 hover:text-bad"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="h-[17px] w-[17px]"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.8}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+          </svg>
+        </button>
       </div>
     </aside>
   )
