@@ -99,6 +99,70 @@ export interface DashboardResponse {
   estoque: MetricasEstoque
 }
 
+/* ---------- Cadastros (CRUD) ---------- */
+
+export interface Cliente {
+  id: number
+  uuid: string
+  nome: string
+  telefone: string | null
+  cpf: string
+  logradouro: string | null
+  numero: string | null
+  bairro: string | null
+  cidade: string | null
+  cep: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ClienteInput {
+  nome: string
+  telefone?: string | null
+  cpf: string
+  logradouro?: string | null
+  numero?: string | null
+  bairro?: string | null
+  cidade?: string | null
+  cep?: string | null
+}
+
+export interface Produto {
+  id: number
+  uuid: string
+  nome: string
+  preco: number
+  quantidadeEstoque: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProdutoInput {
+  nome: string
+  preco: number
+  quantidadeEstoque: number
+}
+
+export type TipoCobranca = 'PorHora' | 'Empreitada'
+
+export interface Servico {
+  id: number
+  uuid: string
+  descricao: string
+  tipoCobranca: TipoCobranca
+  valorHora: number | null
+  valorEmpreitada: number | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ServicoInput {
+  descricao: string
+  tipoCobranca: TipoCobranca
+  valorHora?: number | null
+  valorEmpreitada?: number | null
+}
+
 /* ---------- Atendimento (para a tabela "últimos atendimentos") ---------- */
 
 export type StatusAtendimento = 'Pendente' | 'Concluido' | 'Cancelado'

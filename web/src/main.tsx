@@ -7,16 +7,19 @@ import App from './App.tsx'
 import { queryClient } from './lib/queryClient'
 import { enableMocking } from './mocks/enable'
 import { AuthProvider } from './auth/AuthProvider'
+import { ToastProvider } from './components/ui'
 
 enableMocking().then(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
-        </BrowserRouter>
+        <ToastProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </BrowserRouter>
+        </ToastProvider>
       </QueryClientProvider>
     </StrictMode>,
   )

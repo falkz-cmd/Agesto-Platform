@@ -1,16 +1,13 @@
 import { http, HttpResponse } from 'msw'
-import type { ApiResponse, AuthResponse } from '../types/api'
+import type { AuthResponse } from '../types/api'
+import { ok, fail } from './lib/http'
 import { dashboardMock, ultimosAtendimentosMock } from './data/dashboard'
 import { DEMO_EMAIL, DEMO_SENHA, buildMockJwt } from './data/auth'
-
-/** Envelopa no formato ApiResponse do backend. */
-function ok<T>(data: T, message = 'ok'): ApiResponse<T> {
-  return { success: true, message, data, errors: [] }
-}
+import { clienteHandlers } from './data/clientes'
 
 /**
  * Handlers do MSW. O `*` casa com qualquer origem, então funciona
- * independentemente do VITE_API_BASE_URL. Handlers de auth entram na web-04.
+ * independentemente do VITE_API_BASE_URL.
  */
 export const handlers = [
   http.post('*/api/auth/login', async ({ request }) => {
@@ -22,10 +19,7 @@ export const handlers = [
       }
       return HttpResponse.json(ok(data, 'Login realizado com sucesso.'))
     }
-    return HttpResponse.json(
-      { success: false, message: 'Credenciais inválidas.', data: null, errors: [] },
-      { status: 401 },
-    )
+    return fail(401, 'Credenciais inválidas.')
   }),
 
   http.get('*/api/metrics/dashboard', () =>
@@ -35,4 +29,7 @@ export const handlers = [
   http.get('*/api/atendimento', () =>
     HttpResponse.json(ok(ultimosAtendimentosMock)),
   ),
+
+  // Cadastros (CRUD stateful)
+  ...clienteHandlers,
 ]
