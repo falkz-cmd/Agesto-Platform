@@ -1,0 +1,177 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 2980 >>
+stream
+BT
+/F1 10 Tf
+50 800 Td
+14 TL
+(?# Relatorio TDD - Passo a Passo) Tj
+T*
+() Tj
+T*
+(## Objetivo) Tj
+T*
+(Este relatorio explica, de forma direta, como o ciclo de TDD foi aplicado no projeto `micro-erp) Tj
+T*
+(-auto` para testes de `ClienteService` e `AuthService`.) Tj
+T*
+() Tj
+T*
+(## O que foi criado) Tj
+T*
+(- Projeto de testes `MicroERP.Tests`.) Tj
+T*
+(- Testes com `xUnit`.) Tj
+T*
+(- Mocks com `Moq` para dependencias de repositorio.) Tj
+T*
+(- Uso de `EF Core InMemory` para cenarios de autenticacao sem banco real ativo.) Tj
+T*
+() Tj
+T*
+(## Estrutura principal) Tj
+T*
+(- `MicroERP.Tests/Services/ClienteServiceTests.cs`) Tj
+T*
+(- `MicroERP.Tests/Services/AuthServiceTests.cs`) Tj
+T*
+(- `MicroERP.Tests/MicroERP.Tests.csproj`) Tj
+T*
+() Tj
+T*
+(## Passo a passo do ciclo TDD usado) Tj
+T*
+(1. Escolher um comportamento especifico ja existente no sistema.) Tj
+T*
+(2. Escrever o teste primeiro, descrevendo o resultado esperado.) Tj
+T*
+(3. Rodar os testes e confirmar falha inicial quando aplicavel \(fase RED\).) Tj
+T*
+(4. Ajustar apenas o necessario no codigo de suporte de teste \(fase GREEN\).) Tj
+T*
+(5. Refatorar os testes para manter clareza e reutilizacao \(fase REFACTOR\).) Tj
+T*
+(6. Rodar toda a suite novamente para garantir estabilidade.) Tj
+T*
+() Tj
+T*
+(## Exemplos aplicados) Tj
+T*
+(### ClienteService) Tj
+T*
+(- `CreateAsync`:) Tj
+T*
+(  - deve falhar com excecao quando CPF ja existe.) Tj
+T*
+(  - deve criar cliente com CPF normalizado quando CPF e novo.) Tj
+T*
+(- `UpdateAsync`:) Tj
+T*
+(  - retorna `null` quando cliente nao existe.) Tj
+T*
+(  - lanca excecao quando CPF novo ja pertence a outro cliente.) Tj
+T*
+(  - atualiza e persiste quando CPF esta disponivel.) Tj
+T*
+(- `DeleteAsync`:) Tj
+T*
+(  - retorna `true` e marca exclusao logica quando cliente existe.) Tj
+T*
+(  - retorna `false` quando cliente nao e encontrado.) Tj
+T*
+() Tj
+T*
+(### AuthService) Tj
+T*
+(- `RegisterAsync`:) Tj
+T*
+(  - deve falhar quando email ja existe.) Tj
+T*
+(  - deve persistir usuario com senha em hash.) Tj
+T*
+(- `LoginAsync`:) Tj
+T*
+(  - retorna token quando credenciais estao corretas.) Tj
+T*
+(  - retorna `null` quando senha esta incorreta.) Tj
+T*
+() Tj
+T*
+(## Resultado obtido) Tj
+T*
+(- Suite de testes executada com sucesso.) Tj
+T*
+(- Total atual validado: **11 testes aprovados**.) Tj
+T*
+(- Regras principais da API preservadas para este ciclo.) Tj
+T*
+() Tj
+T*
+(## Como executar) Tj
+T*
+(Na raiz do repositorio:) Tj
+T*
+() Tj
+T*
+(```bash) Tj
+T*
+(dotnet test MicroERP.sln) Tj
+T*
+(```) Tj
+T*
+() Tj
+T*
+(## Beneficios praticos) Tj
+T*
+(- Menor risco de regressao ao alterar codigo.) Tj
+T*
+(- Confirmacao rapida de comportamento esperado.) Tj
+T*
+(- Base mais segura para evolucao de funcionalidades.) Tj
+T*
+() Tj
+T*
+(## Proximo uso recomendado) Tj
+T*
+(Para cada mudanca futura:) Tj
+T*
+(1. escrever o teste primeiro,) Tj
+T*
+(2. executar,) Tj
+T*
+(3. implementar o minimo,) Tj
+T*
+(4. validar tudo novamente.) Tj
+T*
+() Tj
+T*
+(Esse fluxo mantem previsibilidade e reduz erros em producao.) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3343
+%%EOF

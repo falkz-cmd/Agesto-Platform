@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # NuGet (backend C# / .NET 8)
+  - package-ecosystem: "nuget"
+    directory: "/MicroERP.Api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "Auto-academic-erp/core-devs"
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "backend"
+    # Bloqueia atualizacoes major automaticas. Decisao do time em 2026-05-11
+    # apos o PR #5 (Swashbuckle 6 -> 10) ter sido mergeado sem validacao.
+    # Major upgrades viram tarefa manual no Jira com revisao + smoke test.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions (quando configurarmos CI/CD da KAN-16)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
+      - "ci"
+    # Mesma politica do NuGet: nada de major automatico.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

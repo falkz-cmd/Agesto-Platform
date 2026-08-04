@@ -1,0 +1,409 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 4 0 R 5 0 R 6 0 R] /Count 4 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 8 0 R >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 9 0 R >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 10 0 R >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 11 0 R >>
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+8 0 obj
+<< /Length 2112 >>
+stream
+BT
+/F1 10 Tf
+50 800 Td
+14 TL
+(?# Passo a passo completo: xUnit + Moq \(do zero\)) Tj
+T*
+() Tj
+T*
+(## Visao geral) Tj
+T*
+(Este guia mostra, passo a passo, como montar e entender testes automatizados com xUnit e Moq no) Tj
+T*
+( projeto.) Tj
+T*
+() Tj
+T*
+(Meta principal:) Tj
+T*
+(- testar regras de negocio com seguranca,) Tj
+T*
+(- sem depender de banco real ativo,) Tj
+T*
+(- com feedback rapido ao alterar codigo.) Tj
+T*
+() Tj
+T*
+(## Conceitos basicos \(bem direto\)) Tj
+T*
+(- Teste automatizado: pequeno codigo que verifica se outro codigo faz o que deveria.) Tj
+T*
+(- xUnit: ferramenta que executa os testes.) Tj
+T*
+(- Moq: ferramenta que cria "dublês" de dependencias \(mocks\).) Tj
+T*
+(- TDD: pratica de escrever teste antes da implementacao da mudanca.) Tj
+T*
+() Tj
+T*
+(## Quando usar xUnit e Moq) Tj
+T*
+(Use quando sua classe depende de outras camadas.) Tj
+T*
+(Exemplo no projeto:) Tj
+T*
+(- `ClienteService` depende de `IClienteRepository`.) Tj
+T*
+(- Em vez de usar banco, usamos Moq para simular o repositorio.) Tj
+T*
+() Tj
+T*
+(## Estrutura criada) Tj
+T*
+(- Projeto: `MicroERP.Tests`) Tj
+T*
+(- Arquivos principais:) Tj
+T*
+(  - `MicroERP.Tests/Services/ClienteServiceTests.cs`) Tj
+T*
+(  - `MicroERP.Tests/Services/AuthServiceTests.cs`) Tj
+T*
+() Tj
+T*
+(## Passo 1 - Criar projeto de testes) Tj
+T*
+(Criamos um projeto separado para testes, sem misturar com a API.) Tj
+T*
+() Tj
+T*
+(Por que isso e importante:) Tj
+T*
+(- organiza melhor o codigo,) Tj
+T*
+(- evita acoplamento entre producao e teste,) Tj
+T*
+(- facilita rodar todos os testes com um comando.) Tj
+T*
+() Tj
+T*
+(## Passo 2 - Adicionar pacotes) Tj
+T*
+(No `.csproj` de testes, adicionamos:) Tj
+T*
+(- `xunit`) Tj
+T*
+(- `xunit.runner.visualstudio`) Tj
+T*
+(- `Microsoft.NET.Test.Sdk`) Tj
+T*
+(- `Moq`) Tj
+T*
+(- `Microsoft.EntityFrameworkCore.InMemory`) Tj
+T*
+() Tj
+T*
+(Papel de cada um:) Tj
+T*
+(- xUnit: cria e executa testes.) Tj
+T*
+(- runner/test sdk: integra execucao com CLI/IDE.) Tj
+T*
+(- Moq: simula interfaces.) Tj
+T*
+(- InMemory: cria banco temporario em memoria para cenarios que usam DbContext.) Tj
+T*
+() Tj
+T*
+(## Passo 3 - Referenciar a API) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Length 1960 >>
+stream
+BT
+/F1 10 Tf
+50 800 Td
+14 TL
+(Adicionamos `ProjectReference` para `MicroERP.Api`.) Tj
+T*
+() Tj
+T*
+(Assim os testes conseguem acessar:) Tj
+T*
+(- Services reais \(`ClienteService`, `AuthService`\),) Tj
+T*
+(- DTOs,) Tj
+T*
+(- Models,) Tj
+T*
+(- Excecoes.) Tj
+T*
+() Tj
+T*
+(## Passo 4 - Entender o formato de um teste) Tj
+T*
+(Quase todo teste segue AAA:) Tj
+T*
+() Tj
+T*
+(1. Arrange \(Preparar\)) Tj
+T*
+(   - cria dados de entrada,) Tj
+T*
+(   - configura mock/contexto.) Tj
+T*
+(2. Act \(Executar\)) Tj
+T*
+(   - chama o metodo testado.) Tj
+T*
+(3. Assert \(Validar\)) Tj
+T*
+(   - compara resultado esperado com resultado real.) Tj
+T*
+() Tj
+T*
+(## Passo 5 - Exemplo com Moq no ClienteService) Tj
+T*
+(No `ClienteService`, criamos:) Tj
+T*
+(- `Mock<IClienteRepository>`) Tj
+T*
+(- `new ClienteService\(_repositoryMock.Object\)`) Tj
+T*
+() Tj
+T*
+(Comandos mais usados:) Tj
+T*
+(- `Setup\(...\)`: define comportamento simulado.) Tj
+T*
+(- `ReturnsAsync\(...\)`: define retorno async.) Tj
+T*
+(- `Verify\(...\)`: confirma se metodo foi chamado \(ou nao\).) Tj
+T*
+() Tj
+T*
+(Exemplo mental:) Tj
+T*
+(- "Se buscar CPF e ja existir, entao lancar excecao".) Tj
+T*
+(- O mock finge que o CPF existe.) Tj
+T*
+(- O teste valida que a excecao aconteceu.) Tj
+T*
+() Tj
+T*
+(## Passo 6 - Casos cobertos no ClienteService) Tj
+T*
+(### CreateAsync) Tj
+T*
+(- CPF duplicado -> lança `CpfAlreadyExistsException`.) Tj
+T*
+(- CPF novo -> cria cliente, normaliza CPF e salva.) Tj
+T*
+() Tj
+T*
+(### UpdateAsync) Tj
+T*
+(- Cliente nao encontrado -> retorna `null`.) Tj
+T*
+(- CPF novo, mas ja usado -> lança excecao.) Tj
+T*
+(- CPF disponivel -> atualiza e persiste.) Tj
+T*
+() Tj
+T*
+(### DeleteAsync) Tj
+T*
+(- Cliente existe -> exclusao logica \(`DeletedAt`\) e retorno `true`.) Tj
+T*
+(- Cliente nao existe -> retorno `false` sem salvar.) Tj
+T*
+() Tj
+T*
+(## Passo 7 - Exemplo no AuthService \(sem Moq\)) Tj
+T*
+(`AuthService` usa `AppDbContext` direto.) Tj
+T*
+(Nesse caso, usamos `EF Core InMemory`.) Tj
+T*
+() Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Length 1801 >>
+stream
+BT
+/F1 10 Tf
+50 800 Td
+14 TL
+(Como funciona:) Tj
+T*
+(- cada teste cria um banco em memoria com nome unico \(`Guid`\).) Tj
+T*
+(- prepara usuarios de teste.) Tj
+T*
+(- executa `RegisterAsync` e `LoginAsync`.) Tj
+T*
+(- valida resultado.) Tj
+T*
+() Tj
+T*
+(## Passo 8 - Configuracao JWT para teste) Tj
+T*
+(Para login funcionar no teste, montamos `IConfiguration` em memoria com:) Tj
+T*
+(- `Jwt:Secret`) Tj
+T*
+(- `Jwt:Issuer`) Tj
+T*
+(- `Jwt:Audience`) Tj
+T*
+(- `Jwt:ExpiresMinutes`) Tj
+T*
+() Tj
+T*
+(Importante:) Tj
+T*
+(- esse valor e de teste, nao segredo de producao.) Tj
+T*
+() Tj
+T*
+(## Passo 9 - Casos cobertos no AuthService) Tj
+T*
+(### RegisterAsync) Tj
+T*
+(- Email ja existe -> lança `EmailAlreadyExistsException`.) Tj
+T*
+(- Email novo -> salva usuario com senha em hash.) Tj
+T*
+() Tj
+T*
+(### LoginAsync) Tj
+T*
+(- Credenciais corretas -> retorna token.) Tj
+T*
+(- Senha incorreta -> retorna `null`.) Tj
+T*
+() Tj
+T*
+(## Passo 10 - Executar tudo) Tj
+T*
+(Comando:) Tj
+T*
+() Tj
+T*
+(```bash) Tj
+T*
+(dotnet test MicroERP.sln) Tj
+T*
+(```) Tj
+T*
+() Tj
+T*
+(Resultado atual:) Tj
+T*
+(- 11 testes aprovados.) Tj
+T*
+() Tj
+T*
+(## Passo 11 - Como ler uma falha de teste) Tj
+T*
+(Quando falhar:) Tj
+T*
+(1. veja o nome do teste \(ele descreve o comportamento esperado\),) Tj
+T*
+(2. veja a mensagem de erro,) Tj
+T*
+(3. abra o teste,) Tj
+T*
+(4. confira o que o mock estava simulando,) Tj
+T*
+(5. compare com o comportamento do service.) Tj
+T*
+() Tj
+T*
+(## Passo 12 - Como aplicar em novas tarefas) Tj
+T*
+(Sempre que for alterar regra:) Tj
+T*
+(1. escreva primeiro o teste do comportamento novo,) Tj
+T*
+(2. rode e confirme falha inicial,) Tj
+T*
+(3. implemente o minimo necessario,) Tj
+T*
+(4. rode a suite,) Tj
+T*
+(5. refatore com testes verdes.) Tj
+T*
+() Tj
+T*
+(Esse fluxo reduz retrabalho e aumenta confianca no codigo.) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Length 416 >>
+stream
+BT
+/F1 10 Tf
+50 800 Td
+14 TL
+() Tj
+T*
+(## Checklist rapido) Tj
+T*
+(Antes de finalizar uma mudanca:) Tj
+T*
+(- [ ] teste novo cobre o caso principal?) Tj
+T*
+(- [ ] cobriu caso de erro?) Tj
+T*
+(- [ ] validou chamadas esperadas \(`Verify`\) quando usa Moq?) Tj
+T*
+(- [ ] executou `dotnet test`?) Tj
+T*
+(- [ ] suite ficou verde?) Tj
+T*
+() Tj
+T*
+(Se todos itens estiverem ok, a mudanca esta mais segura para commit.) Tj
+ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000133 00000 n 
+0000000259 00000 n 
+0000000385 00000 n 
+0000000512 00000 n 
+0000000639 00000 n 
+0000000709 00000 n 
+0000002873 00000 n 
+0000004885 00000 n 
+0000006739 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R >>
+startxref
+7207
+%%EOF

@@ -1,0 +1,30 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroERP.Api", "MicroERP.Api\MicroERP.Api.csproj", "{F89B556B-CA07-4453-7E24-A5CDCE02A6EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroERP.Tests", "MicroERP.Tests\MicroERP.Tests.csproj", "{F3966A6B-3060-4CE1-8B4A-40D694365790}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F89B556B-CA07-4453-7E24-A5CDCE02A6EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F89B556B-CA07-4453-7E24-A5CDCE02A6EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F89B556B-CA07-4453-7E24-A5CDCE02A6EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F89B556B-CA07-4453-7E24-A5CDCE02A6EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3966A6B-3060-4CE1-8B4A-40D694365790}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3966A6B-3060-4CE1-8B4A-40D694365790}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3966A6B-3060-4CE1-8B4A-40D694365790}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3966A6B-3060-4CE1-8B4A-40D694365790}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8EA0704E-27BC-4E32-BC00-A83344DBD3E7}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,48 @@
+@MicroERP.Api_HostAddress = https://localhost:5001
+@token = COLE_O_JWT_DEPOIS_DO_LOGIN
+
+### Cadastrar usuario
+POST {{MicroERP.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "nome": "Diego Mendes",
+  "email": "diego@example.com",
+  "senha": "senhaSegura123"
+}
+
+### Login (copia o token retornado para a variavel @token acima)
+POST {{MicroERP.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "diego@example.com",
+  "senha": "senhaSegura123"
+}
+
+### Listar clientes (autenticado)
+GET {{MicroERP.Api_HostAddress}}/api/cliente
+Authorization: Bearer {{token}}
+
+### Cadastrar cliente
+POST {{MicroERP.Api_HostAddress}}/api/cliente
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Cliente Teste",
+  "telefone": "31999998888",
+  "cpf": "12345678900"
+}
+
+### Listar produtos
+GET {{MicroERP.Api_HostAddress}}/api/produto
+Authorization: Bearer {{token}}
+
+### Listar servicos
+GET {{MicroERP.Api_HostAddress}}/api/servico
+Authorization: Bearer {{token}}
+
+### Listar atendimentos
+GET {{MicroERP.Api_HostAddress}}/api/atendimento
+Authorization: Bearer {{token}}

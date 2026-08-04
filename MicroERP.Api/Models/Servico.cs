@@ -1,0 +1,20 @@
+using MicroERP.Api.Enums;
+
+namespace MicroERP.Api.Models;
+
+public class Servico
+{
+    public long Id { get; set; }
+    public Guid Uuid { get; set; }
+    public string Descricao { get; set; } = string.Empty;
+    public TipoCobranca TipoCobranca { get; set; } = TipoCobranca.PorHora;
+    public decimal? ValorHora { get; set; }
+    public decimal? ValorEmpreitada { get; set; }
+    public long EmpresaId { get; set; }
+    public Empresa? Empresa { get; set; }
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? SyncedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
+}

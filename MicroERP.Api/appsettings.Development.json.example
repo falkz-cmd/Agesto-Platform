@@ -1,0 +1,18 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=db.SEU_PROJETO.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=SUA_SENHA;SSL Mode=Require;Trust Server Certificate=true"
+  },
+  "Jwt": {
+    "Issuer": "MicroERP.Api",
+    "Audience": "MicroERP.Api",
+    "Secret": "GERE_UMA_CHAVE_LONGA_COM_MINIMO_32_BYTES_USE_OPENSSL_RAND_BASE64_32",
+    "ExpiresMinutes": 120
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
+    }
+  }
+}

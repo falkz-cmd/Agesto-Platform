@@ -1,0 +1,19 @@
+namespace MicroERP.Api.Models;
+
+public class ItemServico
+{
+    public long Id { get; set; }
+    public Guid Uuid { get; set; }
+    public int Quantidade { get; set; }
+    public decimal PrecoUnitario { get; set; }
+    public decimal Subtotal { get; set; }
+    public long AtendimentoId { get; set; }
+    public long ServicoId { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? SyncedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
+
+    public Atendimento? Atendimento { get; set; }
+    public Servico? Servico { get; set; }
+}
