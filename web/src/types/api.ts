@@ -180,3 +180,17 @@ export interface AtendimentoResumo {
   margem: number
   status: StatusAtendimento
 }
+
+/** Item de agenda enriquecido (GET /api/atendimento/agenda). */
+export interface AgendaItem {
+  id: number
+  uuid: string
+  dataAgendada: string | null
+  status: StatusAtendimento
+  valorTotal: number
+  clienteId: number
+  clienteNome: string
+  clienteTelefone: string | null
+  enderecoResumo: string | null
+  resumo: string
+}

@@ -6,6 +6,7 @@ import { DEMO_EMAIL, DEMO_SENHA, buildMockJwt } from './data/auth'
 import { clienteHandlers } from './data/clientes'
 import { produtoHandlers } from './data/produtos'
 import { servicoHandlers } from './data/servicos'
+import { agendaHandlers } from './data/agenda'
 
 /**
  * Handlers do MSW. O `*` casa com qualquer origem, então funciona
@@ -27,6 +28,9 @@ export const handlers = [
   http.get('*/api/metrics/dashboard', () =>
     HttpResponse.json(ok(dashboardMock, 'Dashboard consolidado.')),
   ),
+
+  // Agenda (path mais específico antes do genérico)
+  ...agendaHandlers,
 
   http.get('*/api/atendimento', () =>
     HttpResponse.json(ok(ultimosAtendimentosMock)),

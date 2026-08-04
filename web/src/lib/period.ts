@@ -18,3 +18,29 @@ export function periodRange(
 
   return { de: de.toISOString(), ate: now.toISOString() }
 }
+
+/**
+ * Janela do período para a **agenda** — inclui o futuro (ao contrário do
+ * range analítico, que termina em "agora"). Cobre o período inteiro.
+ */
+export function agendaRange(
+  period: Period,
+  now = new Date(),
+): { de: string; ate: string } {
+  const de = new Date(now)
+  de.setHours(0, 0, 0, 0)
+  const ate = new Date(now)
+  ate.setHours(23, 59, 59, 999)
+
+  if (period === '7d') {
+    ate.setDate(ate.getDate() + 7)
+  } else if (period === 'mes') {
+    de.setDate(1)
+    ate.setMonth(ate.getMonth() + 1, 0) // último dia do mês corrente
+  } else {
+    de.setMonth(0, 1)
+    ate.setMonth(11, 31)
+  }
+
+  return { de: de.toISOString(), ate: ate.toISOString() }
+}
