@@ -224,6 +224,18 @@ export interface AtendimentoResumo {
   status: StatusAtendimento
 }
 
+/* ---------- Configuração (parametrização da empresa) ---------- */
+
+export type TipoOperacao = 'Venda' | 'Servico' | 'Hibrido'
+
+export interface Configuracao {
+  id: number
+  tipoOperacao: TipoOperacao
+  empresaId: number
+  createdAt: string
+  updatedAt: string
+}
+
 /* ---------- Atendimento (execução) ---------- */
 
 export interface Atendimento {

@@ -10,6 +10,7 @@ import { ServicosPage } from './features/servicos/ServicosPage'
 import { AgendaPage } from './features/agenda/AgendaPage'
 import { OrcamentosPage } from './features/orcamentos/OrcamentosPage'
 import { AtendimentosPage } from './features/atendimentos/AtendimentosPage'
+import { ParametrizacaoPage } from './features/parametrizacao/ParametrizacaoPage'
 
 export default function App() {
   return (
@@ -26,10 +27,7 @@ export default function App() {
           <Route path="produtos" element={<ProdutosPage />} />
           <Route path="servicos" element={<ServicosPage />} />
           <Route path="relatorios" element={<Placeholder title="Relatórios" />} />
-          <Route
-            path="parametrizacao"
-            element={<Placeholder title="Parametrização" />}
-          />
+          <Route path="parametrizacao" element={<ParametrizacaoPage />} />
         </Route>
       </Route>
 
