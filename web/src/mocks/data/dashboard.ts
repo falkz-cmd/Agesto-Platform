@@ -66,7 +66,12 @@ export const dashboardMock: DashboardResponse = {
     ],
   },
   estoque: {
-    giro: [],
+    giro: [
+      { produtoId: 1, nome: 'Suporte universal', quantidadeEstoque: 16, unidadesVendidas: 24 },
+      { produtoId: 3, nome: 'Cano de dreno (m)', quantidadeEstoque: 40, unidadesVendidas: 40 },
+      { produtoId: 4, nome: 'Fita PVC', quantidadeEstoque: 31, unidadesVendidas: 31 },
+      { produtoId: 2, nome: 'Gás R-410a (kg)', quantidadeEstoque: 3, unidadesVendidas: 18 },
+    ],
     produtosParados: [
       {
         produtoId: 5,

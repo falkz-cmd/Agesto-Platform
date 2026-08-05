@@ -3,7 +3,6 @@ import { AppShell } from './layout/AppShell'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { Login } from './pages/Login'
 import { Dashboard } from './pages/Dashboard'
-import { Placeholder } from './pages/Placeholder'
 import { ClientesPage } from './features/clientes/ClientesPage'
 import { ProdutosPage } from './features/produtos/ProdutosPage'
 import { ServicosPage } from './features/servicos/ServicosPage'
@@ -11,6 +10,7 @@ import { AgendaPage } from './features/agenda/AgendaPage'
 import { OrcamentosPage } from './features/orcamentos/OrcamentosPage'
 import { AtendimentosPage } from './features/atendimentos/AtendimentosPage'
 import { ParametrizacaoPage } from './features/parametrizacao/ParametrizacaoPage'
+import { RelatoriosPage } from './features/relatorios/RelatoriosPage'
 
 export default function App() {
   return (
@@ -26,7 +26,7 @@ export default function App() {
           <Route path="clientes" element={<ClientesPage />} />
           <Route path="produtos" element={<ProdutosPage />} />
           <Route path="servicos" element={<ServicosPage />} />
-          <Route path="relatorios" element={<Placeholder title="Relatórios" />} />
+          <Route path="relatorios" element={<RelatoriosPage />} />
           <Route path="parametrizacao" element={<ParametrizacaoPage />} />
         </Route>
       </Route>
