@@ -1,4 +1,4 @@
-import type { DashboardResponse, AtendimentoResumo } from '../../types/api'
+import type { DashboardResponse } from '../../types/api'
 
 /** Série diária de receita (30 dias até hoje), somando ~R$ 18.420. */
 function buildSerie(): DashboardResponse['vendas']['receitaPorPeriodo'] {
@@ -86,11 +86,3 @@ export const dashboardMock: DashboardResponse = {
     ],
   },
 }
-
-/** Formato-alvo dos últimos atendimentos (delta de backend). */
-export const ultimosAtendimentosMock: AtendimentoResumo[] = [
-  { id: 1, resumo: 'Instalação de AC', clienteNome: 'Vó Joana', valorTotal: 1200, margem: 740, status: 'Concluido' },
-  { id: 2, resumo: 'Manutenção', clienteNome: 'Marina A.', valorTotal: 380, margem: 250, status: 'Concluido' },
-  { id: 3, resumo: 'Troca de compressor', clienteNome: 'Renata V.', valorTotal: 1640, margem: 610, status: 'Pendente' },
-  { id: 4, resumo: 'Limpeza', clienteNome: 'Lúcia T.', valorTotal: 260, margem: 180, status: 'Concluido' },
-]

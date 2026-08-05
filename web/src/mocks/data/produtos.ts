@@ -10,6 +10,6 @@ const seed: Produto[] = [
   { id: 4, uuid: crypto.randomUUID(), nome: 'Fita PVC', preco: 15, quantidadeEstoque: 31, createdAt: now, updatedAt: now },
 ]
 
-const store: Store<Produto> = makeStore(seed)
+export const produtoStore: Store<Produto> = makeStore(seed)
 
-export const produtoHandlers = crudHandlers('/api/produto', store)
+export const produtoHandlers = crudHandlers('/api/produto', produtoStore)

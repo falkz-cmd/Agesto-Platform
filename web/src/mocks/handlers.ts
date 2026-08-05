@@ -1,12 +1,13 @@
 import { http, HttpResponse } from 'msw'
 import type { AuthResponse } from '../types/api'
 import { ok, fail } from './lib/http'
-import { dashboardMock, ultimosAtendimentosMock } from './data/dashboard'
+import { dashboardMock } from './data/dashboard'
 import { DEMO_EMAIL, DEMO_SENHA, buildMockJwt } from './data/auth'
 import { clienteHandlers } from './data/clientes'
 import { produtoHandlers } from './data/produtos'
 import { servicoHandlers } from './data/servicos'
 import { agendaHandlers } from './data/agenda'
+import { atendimentoHandlers } from './data/atendimentos'
 import { orcamentoHandlers } from './data/orcamentos'
 
 /**
@@ -30,12 +31,9 @@ export const handlers = [
     HttpResponse.json(ok(dashboardMock, 'Dashboard consolidado.')),
   ),
 
-  // Agenda (path mais específico antes do genérico)
+  // Agenda (path mais específico antes do genérico de atendimento)
   ...agendaHandlers,
-
-  http.get('*/api/atendimento', () =>
-    HttpResponse.json(ok(ultimosAtendimentosMock)),
-  ),
+  ...atendimentoHandlers,
 
   // Cadastros (CRUD stateful)
   ...clienteHandlers,

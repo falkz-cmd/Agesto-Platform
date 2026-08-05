@@ -224,6 +224,75 @@ export interface AtendimentoResumo {
   status: StatusAtendimento
 }
 
+/* ---------- Atendimento (execução) ---------- */
+
+export interface Atendimento {
+  id: number
+  uuid: string
+  dataRegistro: string
+  dataAgendada: string | null
+  status: StatusAtendimento
+  valorTotal: number
+  custoTotal: number
+  margem: number
+  clienteId: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AtendimentoInput {
+  clienteId: number
+  status: StatusAtendimento
+  dataAgendada?: string | null
+}
+
+export interface AtendimentoUpdate {
+  status: StatusAtendimento
+  dataAgendada?: string | null
+}
+
+export interface ItemProdutoResp {
+  id: number
+  uuid: string
+  quantidade: number
+  precoUnitario: number
+  subtotal: number
+  custo: number | null
+  descricao: string | null
+  atendimentoId: number
+  produtoId: number | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ItemProdutoInput {
+  atendimentoId: number
+  produtoId?: number | null
+  descricao?: string | null
+  precoUnitario?: number | null
+  custo?: number | null
+  quantidade: number
+}
+
+export interface ItemServicoResp {
+  id: number
+  uuid: string
+  quantidade: number
+  precoUnitario: number
+  subtotal: number
+  atendimentoId: number
+  servicoId: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ItemServicoInput {
+  atendimentoId: number
+  servicoId: number
+  precoUnitario?: number | null
+  quantidade: number
+}
+
 /** Item de agenda enriquecido (GET /api/atendimento/agenda). */
 export interface AgendaItem {
   id: number

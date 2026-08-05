@@ -9,6 +9,7 @@ import { ProdutosPage } from './features/produtos/ProdutosPage'
 import { ServicosPage } from './features/servicos/ServicosPage'
 import { AgendaPage } from './features/agenda/AgendaPage'
 import { OrcamentosPage } from './features/orcamentos/OrcamentosPage'
+import { AtendimentosPage } from './features/atendimentos/AtendimentosPage'
 
 export default function App() {
   return (
@@ -18,7 +19,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppShell />}>
           <Route index element={<Dashboard />} />
-          <Route path="atendimentos" element={<Placeholder title="Atendimentos" />} />
+          <Route path="atendimentos" element={<AtendimentosPage />} />
           <Route path="orcamentos" element={<OrcamentosPage />} />
           <Route path="agenda" element={<AgendaPage />} />
           <Route path="clientes" element={<ClientesPage />} />

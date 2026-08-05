@@ -9,6 +9,6 @@ const seed: Servico[] = [
   { id: 3, uuid: crypto.randomUUID(), descricao: 'Limpeza / higienização', tipoCobranca: 'PorHora', valorHora: 90, valorEmpreitada: null, createdAt: now, updatedAt: now },
 ]
 
-const store: Store<Servico> = makeStore(seed)
+export const servicoStore: Store<Servico> = makeStore(seed)
 
-export const servicoHandlers = crudHandlers('/api/servico', store)
+export const servicoHandlers = crudHandlers('/api/servico', servicoStore)

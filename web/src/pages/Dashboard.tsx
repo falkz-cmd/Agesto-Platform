@@ -10,7 +10,9 @@ import {
   IconClock,
 } from '../components/icons'
 import { ReceitaChart } from '../components/ReceitaChart'
-import { useDashboard, useUltimosAtendimentos } from '../lib/queries'
+import { useDashboard } from '../lib/queries'
+import { useAtendimentos } from '../features/atendimentos/queries'
+import { clientesResource } from '../features/clientes/resource'
 import { ApiError } from '../lib/api'
 import type { StatusAtendimento } from '../types/api'
 
@@ -24,10 +26,20 @@ function pct(value: number, max: number): number {
   return max > 0 ? (value / max) * 100 : 0
 }
 
+function dataCurta(iso: string): string {
+  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+}
+
 export function Dashboard() {
   const { period } = useOutletContext<ShellContext>()
   const { data, isLoading, isError, error } = useDashboard(period)
-  const atend = useUltimosAtendimentos()
+  const atend = useAtendimentos()
+  const clientes = clientesResource.useList()
+  const clienteNome = (id: number) =>
+    clientes.data?.find((c) => c.id === id)?.nome ?? `Cliente #${id}`
+  const ultimos = [...(atend.data ?? [])]
+    .sort((a, b) => b.dataRegistro.localeCompare(a.dataRegistro))
+    .slice(0, 5)
 
   if (isLoading) {
     return (
@@ -151,8 +163,8 @@ export function Dashboard() {
           <table className="w-full text-[13px]">
             <thead>
               <tr className="border-b border-line-2 text-[10.5px] uppercase tracking-[0.06em] text-ink-4">
-                <th className="pb-2.5 text-left font-bold">Serviço</th>
                 <th className="pb-2.5 text-left font-bold">Cliente</th>
+                <th className="pb-2.5 text-left font-bold">Data</th>
                 <th className="pb-2.5 text-right font-bold">Total</th>
                 <th className="pb-2.5 text-right font-bold">Margem</th>
                 <th className="pb-2.5 text-right font-bold">Status</th>
@@ -166,10 +178,10 @@ export function Dashboard() {
                   </td>
                 </tr>
               )}
-              {atend.data?.map((a) => (
+              {ultimos.map((a) => (
                 <tr key={a.id} className="border-b border-line-2 last:border-0">
-                  <td className="py-[11px] text-ink">{a.resumo}</td>
-                  <td className="py-[11px] text-ink-2">{a.clienteNome}</td>
+                  <td className="py-[11px] text-ink">{clienteNome(a.clienteId)}</td>
+                  <td className="py-[11px] text-ink-3">{dataCurta(a.dataRegistro)}</td>
                   <td className="py-[11px] text-right tabular-nums">
                     <Money value={a.valorTotal} />
                   </td>
