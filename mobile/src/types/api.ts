@@ -10,6 +10,11 @@ export interface ApiResponse<T> {
   errors: string[]
 }
 
+export interface AuthResponse {
+  token: string
+  expiresAt: string
+}
+
 export type StatusAtendimento = 'Pendente' | 'Concluido' | 'Cancelado'
 export type TipoCobranca = 'PorHora' | 'Empreitada'
 export type StatusOrcamento = 'Rascunho' | 'Enviado' | 'Aprovado' | 'Recusado'

@@ -1,0 +1,45 @@
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { api } from '@/lib/api'
+import { getToken, setToken, clearToken } from '@/lib/tokenStore'
+import { db } from '@/db/instance'
+import { carga } from '@/sync/sync'
+import { AuthContext, type AuthValue } from './context'
+import type { AuthResponse } from '@/types/api'
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [token, setTok] = useState<string | null>(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    ;(async () => {
+      await db.init()
+      setTok(await getToken())
+      setReady(true)
+    })()
+  }, [])
+
+  const login = useCallback(async (email: string, senha: string) => {
+    const res = await api.post<AuthResponse>('/api/auth/login', { email, senha })
+    await setToken(res.token)
+    // Popula o banco local ANTES de sinalizar autenticado (senão a guarda
+    // navega pras abas com o banco ainda vazio). Offline: segue com o local.
+    try {
+      await carga()
+    } catch {
+      // sem rede: entra com o que já houver no device
+    }
+    setTok(res.token)
+  }, [])
+
+  const logout = useCallback(async () => {
+    await clearToken()
+    setTok(null)
+  }, [])
+
+  const value = useMemo<AuthValue>(
+    () => ({ token, ready, login, logout }),
+    [token, ready, login, logout],
+  )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
