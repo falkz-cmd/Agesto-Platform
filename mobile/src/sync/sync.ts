@@ -1,12 +1,16 @@
 import { api } from '@/lib/api'
 import { db } from '@/db/instance'
 import type { LocalDb } from '@/db/types'
-import type { SyncCargaResponse } from '@/types/api'
+import type { AgendaItem, SyncCargaResponse } from '@/types/api'
 
 export interface CargaResult {
   clientes: number
   produtos: number
   servicos: number
+}
+
+export interface SyncResult extends CargaResult {
+  agenda: number
 }
 
 /**
@@ -29,4 +33,22 @@ export async function carga(database: LocalDb = db): Promise<CargaResult> {
     produtos: data.produtos.length,
     servicos: data.servicos.length,
   }
+}
+
+/**
+ * Busca a agenda do dia (GET /api/atendimento/agenda) e cacheia local.
+ * NB: a Carga não inclui a agenda hoje — este passo cobre isso (delta de
+ * backend: idealmente a agenda entraria na Carga para ficar 100% offline).
+ */
+export async function syncAgenda(database: LocalDb = db): Promise<number> {
+  const items = await api.get<AgendaItem[]>('/api/atendimento/agenda')
+  await database.saveAgenda(items)
+  return items.length
+}
+
+/** Sincronização inicial (login): dados de referência + agenda do dia. */
+export async function initialSync(database: LocalDb = db): Promise<SyncResult> {
+  const c = await carga(database)
+  const agenda = await syncAgenda(database)
+  return { ...c, agenda }
 }

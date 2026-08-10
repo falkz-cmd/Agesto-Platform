@@ -1,4 +1,4 @@
-import type { Cliente, Produto, Servico, SyncCargaResponse } from '@/types/api'
+import type { AgendaItem, Cliente, Produto, Servico, SyncCargaResponse } from '@/types/api'
 
 const clientes: Cliente[] = [
   { id: 1, uuid: 'c1', nome: 'Vó Joana', telefone: '(34) 99999-0000', cpf: '111.222.333-44', logradouro: 'R. das Acácias', numero: '120', bairro: 'Centro', cidade: 'Uberaba', cep: '38010-000' },
@@ -20,4 +20,19 @@ const servicos: Servico[] = [
 
 export function seedCarga(): SyncCargaResponse {
   return { clientes, produtos, servicos, sincronizadoEm: new Date().toISOString() }
+}
+
+function hoje(hour: number, min = 0): string {
+  const d = new Date()
+  d.setHours(hour, min, 0, 0)
+  return d.toISOString()
+}
+
+/** Agenda do dia do agente (GET /api/atendimento/agenda). */
+export function seedAgenda(): AgendaItem[] {
+  return [
+    { id: 101, dataAgendada: hoje(9, 0), status: 'Pendente', valorTotal: 1200, clienteId: 1, clienteNome: 'Vó Joana', clienteTelefone: '(34) 99999-0000', enderecoResumo: 'R. das Acácias, 120 — Centro', resumo: 'Instalação de ar-condicionado' },
+    { id: 102, dataAgendada: hoje(11, 30), status: 'Pendente', valorTotal: 380, clienteId: 2, clienteNome: 'Marina Alves', clienteTelefone: '(34) 98888-1010', enderecoResumo: 'Av. Leopoldino, 45 — Fabrício', resumo: 'Manutenção preventiva' },
+    { id: 103, dataAgendada: hoje(15, 0), status: 'Pendente', valorTotal: 1640, clienteId: 3, clienteNome: 'Renata Vieira', clienteTelefone: null, enderecoResumo: 'Centro', resumo: 'Orçamento — troca de compressor' },
+  ]
 }

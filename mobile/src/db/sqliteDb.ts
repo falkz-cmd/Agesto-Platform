@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite'
-import type { Cliente, Produto, Servico } from '@/types/api'
+import type { AgendaItem, Cliente, Produto, Servico } from '@/types/api'
 import type { LocalDb, LocalAtendimento } from './types'
 
 type Row = { json: string }
@@ -35,6 +35,7 @@ export function createSqliteDb(): LocalDb {
         CREATE TABLE IF NOT EXISTS clientes (id INTEGER PRIMARY KEY, json TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS produtos (id INTEGER PRIMARY KEY, json TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS servicos (id INTEGER PRIMARY KEY, json TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS agenda (id INTEGER PRIMARY KEY, json TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS atendimentos (uuid TEXT PRIMARY KEY, json TEXT NOT NULL, syncedAt TEXT);
         CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
       `)
@@ -43,9 +44,11 @@ export function createSqliteDb(): LocalDb {
     saveClientes: (items) => saveRef('clientes', items),
     saveProdutos: (items) => saveRef('produtos', items),
     saveServicos: (items) => saveRef('servicos', items),
+    saveAgenda: (items) => saveRef('agenda', items),
     getClientes: () => getRef<Cliente>('clientes'),
     getProdutos: () => getRef<Produto>('produtos'),
     getServicos: () => getRef<Servico>('servicos'),
+    getAgenda: () => getRef<AgendaItem>('agenda'),
 
     async addAtendimento(a) {
       const d = await conn()
@@ -87,7 +90,7 @@ export function createSqliteDb(): LocalDb {
 
     async reset() {
       const d = await conn()
-      await d.execAsync(`DELETE FROM clientes; DELETE FROM produtos; DELETE FROM servicos; DELETE FROM atendimentos; DELETE FROM meta;`)
+      await d.execAsync(`DELETE FROM clientes; DELETE FROM produtos; DELETE FROM servicos; DELETE FROM agenda; DELETE FROM atendimentos; DELETE FROM meta;`)
     },
   }
 }

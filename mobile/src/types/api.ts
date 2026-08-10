@@ -49,6 +49,19 @@ export interface Servico {
   valorEmpreitada: number | null
 }
 
+/** Item de agenda enriquecido (GET /api/atendimento/agenda). */
+export interface AgendaItem {
+  id: number
+  dataAgendada: string | null
+  status: StatusAtendimento
+  valorTotal: number
+  clienteId: number
+  clienteNome: string
+  clienteTelefone: string | null
+  enderecoResumo: string | null
+  resumo: string
+}
+
 /* ---- Sincronização (Carga/Descarga) ---- */
 
 export interface SyncCargaResponse {

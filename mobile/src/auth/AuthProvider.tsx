@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { api } from '@/lib/api'
 import { getToken, setToken, clearToken } from '@/lib/tokenStore'
 import { db } from '@/db/instance'
-import { carga } from '@/sync/sync'
+import { initialSync } from '@/sync/sync'
 import { AuthContext, type AuthValue } from './context'
 import type { AuthResponse } from '@/types/api'
 
@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Popula o banco local ANTES de sinalizar autenticado (senão a guarda
     // navega pras abas com o banco ainda vazio). Offline: segue com o local.
     try {
-      await carga()
+      await initialSync()
     } catch {
       // sem rede: entra com o que já houver no device
     }

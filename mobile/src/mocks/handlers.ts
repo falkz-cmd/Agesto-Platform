@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/errors'
 import type { AuthResponse } from '@/types/api'
-import { seedCarga } from './data'
+import { seedCarga, seedAgenda } from './data'
 
 export const DEMO_EMAIL = 'agente@agesto.app'
 export const DEMO_SENHA = 'agesto123'
@@ -45,6 +45,10 @@ export async function mockFetch<T>(method: string, path: string, body?: unknown)
 
   if (method === 'GET' && path.startsWith('/api/sync/carga')) {
     return seedCarga() as T
+  }
+
+  if (method === 'GET' && path.startsWith('/api/atendimento/agenda')) {
+    return seedAgenda() as T
   }
 
   throw new ApiError(404, `Sem mock para ${method} ${path}`)
