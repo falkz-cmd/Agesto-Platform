@@ -1,6 +1,7 @@
 import { config } from './config'
 import { ApiError } from './errors'
 import { getToken, clearToken } from './tokenStore'
+import { notifySessionExpired } from './session'
 import { mockFetch } from '@/mocks/handlers'
 import type { ApiResponse } from '@/types/api'
 
@@ -27,8 +28,13 @@ async function apiFetch<T>(method: Method, path: string, body?: unknown): Promis
     env = null
   }
 
-  // 401 com token = sessão expirada -> limpa (login trata o 401 sem token).
-  if (res.status === 401 && token) await clearToken()
+  // 401 com token = sessão expirada -> limpa e invalida o estado de auth
+  // (a guarda de rota redireciona pro login). No login não há token, então
+  // o 401 ali é tratado como credencial inválida.
+  if (res.status === 401 && token) {
+    await clearToken()
+    notifySessionExpired()
+  }
 
   if (!res.ok || !env?.success) {
     throw new ApiError(res.status, env?.message ?? `Erro ${res.status}`)

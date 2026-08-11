@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api } from '@/lib/api'
 import { getToken, setToken, clearToken } from '@/lib/tokenStore'
+import { setOnSessionExpired } from '@/lib/session'
 import { db } from '@/db/instance'
 import { initialSync } from '@/sync/sync'
 import { AuthContext, type AuthValue } from './context'
@@ -11,11 +12,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
+    // 401 de sessão expirada (API real) limpa o estado de auth -> guarda redireciona.
+    setOnSessionExpired(() => setTok(null))
     ;(async () => {
       await db.init()
       setTok(await getToken())
       setReady(true)
     })()
+    return () => setOnSessionExpired(null)
   }, [])
 
   const login = useCallback(async (email: string, senha: string) => {

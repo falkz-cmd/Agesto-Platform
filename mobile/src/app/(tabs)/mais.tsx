@@ -34,7 +34,13 @@ export default function Mais() {
 
   useFocusEffect(
     useCallback(() => {
-      reload()
+      let active = true
+      ;(async () => {
+        if (active) await reload()
+      })()
+      return () => {
+        active = false
+      }
     }, [reload]),
   )
 
