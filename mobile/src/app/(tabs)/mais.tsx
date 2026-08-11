@@ -1,19 +1,86 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native'
+import { useCallback, useState } from 'react'
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useFocusEffect } from 'expo-router'
 import { Screen } from '@/ui/Screen'
 import { colors, radius, space } from '@/ui/theme'
 import { useAuth } from '@/auth/useAuth'
+import { db } from '@/db/instance'
+import { descarga } from '@/sync/sync'
+
+function fmt(iso: string | null): string {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
 
 export default function Mais() {
   const { logout } = useAuth()
+  const [pendAt, setPendAt] = useState(0)
+  const [pendCli, setPendCli] = useState(0)
+  const [lastSync, setLastSync] = useState<string | null>(null)
+  const [syncing, setSyncing] = useState(false)
+  const [flash, setFlash] = useState<string | null>(null)
+
+  const reload = useCallback(async () => {
+    const [at, cli, ls] = await Promise.all([
+      db.getPendingAtendimentos(),
+      db.getPendingClientes(),
+      db.getMeta('lastSync'),
+    ])
+    setPendAt(at.length)
+    setPendCli(cli.filter((c) => c.syncedAt === null).length)
+    setLastSync(ls)
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      reload()
+    }, [reload]),
+  )
+
+  async function sincronizar() {
+    setSyncing(true)
+    setFlash(null)
+    try {
+      const r = await descarga()
+      setFlash(`Enviados: ${r.atendimentosImportados} atendimento(s), ${r.clientesImportados} cliente(s).`)
+      await reload()
+    } catch {
+      setFlash('Falha ao sincronizar. Tente novamente com internet.')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  const pendentes = pendAt + pendCli
+
   return (
     <Screen>
       <View style={styles.wrap}>
         <Text style={styles.title}>Mais</Text>
-        <Pressable
-          onPress={logout}
-          style={({ pressed }) => [styles.row, pressed && { opacity: 0.85 }]}
-        >
+
+        <View style={styles.card}>
+          <View style={styles.cardHead}>
+            <Ionicons name="sync-outline" size={18} color={colors.brandInk} />
+            <Text style={styles.cardTitle}>Sincronização</Text>
+          </View>
+          <Text style={styles.status}>
+            {pendentes === 0
+              ? 'Tudo sincronizado.'
+              : `${pendAt} atendimento${pendAt === 1 ? '' : 's'} e ${pendCli} cliente${pendCli === 1 ? '' : 's'} pendentes de envio.`}
+          </Text>
+          <Text style={styles.sub}>Última sincronização: {fmt(lastSync)}</Text>
+          {flash && <Text style={styles.flash}>{flash}</Text>}
+          <Pressable
+            onPress={sincronizar}
+            disabled={syncing || pendentes === 0}
+            style={({ pressed }) => [styles.syncBtn, (syncing || pendentes === 0 || pressed) && { opacity: 0.6 }]}
+          >
+            {syncing ? <ActivityIndicator color="#fff" /> : <Text style={styles.syncText}>Sincronizar agora</Text>}
+          </Pressable>
+        </View>
+
+        <Pressable onPress={logout} style={({ pressed }) => [styles.row, pressed && { opacity: 0.85 }]}>
           <Ionicons name="log-out-outline" size={20} color={colors.bad} />
           <Text style={styles.rowText}>Sair</Text>
         </Pressable>
@@ -25,6 +92,16 @@ export default function Mais() {
 const styles = StyleSheet.create({
   wrap: { flex: 1, padding: space(5), gap: space(4) },
   title: { fontSize: 18, fontWeight: '700', color: colors.ink },
+
+  card: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, borderRadius: radius.card, padding: space(4), gap: space(2) },
+  cardHead: { flexDirection: 'row', alignItems: 'center', gap: space(2) },
+  cardTitle: { fontSize: 14.5, fontWeight: '700', color: colors.ink },
+  status: { fontSize: 14, color: colors.ink2 },
+  sub: { fontSize: 12.5, color: colors.ink3 },
+  flash: { fontSize: 12.5, color: colors.good, fontWeight: '600' },
+  syncBtn: { marginTop: space(2), backgroundColor: colors.brand, borderRadius: radius.sm, paddingVertical: space(3.25), alignItems: 'center' },
+  syncText: { color: '#fff', fontSize: 14.5, fontWeight: '700' },
+
   row: {
     flexDirection: 'row',
     alignItems: 'center',

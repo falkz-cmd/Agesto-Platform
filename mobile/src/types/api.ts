@@ -92,3 +92,15 @@ export interface AtendimentoSyncRequest {
   itensProduto: { produtoId: number; quantidade: number }[]
   itensServico: { servicoId: number; quantidade: number }[]
 }
+
+export interface SyncDescargaRequest {
+  clientes: ClienteInput[]
+  atendimentos: AtendimentoSyncRequest[]
+}
+
+export interface SyncDescargaResponse {
+  atendimentosImportados: number
+  clientesImportados: number
+  erros: string[]
+  sincronizadoEm: string
+}

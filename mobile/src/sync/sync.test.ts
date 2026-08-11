@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals'
-import { carga, initialSync } from './sync'
+import { carga, initialSync, descarga } from './sync'
 import { createMemoryDb } from '@/db/memoryDb'
 
 describe('sync.carga (mock)', () => {
@@ -28,5 +28,30 @@ describe('sync.carga (mock)', () => {
     const agenda = await mem.getAgenda()
     expect(agenda).toHaveLength(3)
     expect(agenda[0].clienteNome).toBeTruthy()
+  })
+
+  it('descarga empurra pendentes e marca como sincronizado', async () => {
+    const mem = createMemoryDb()
+    await mem.addCliente({
+      uuid: 'c1', nome: 'Novo', cpf: '11122233344', telefone: null,
+      logradouro: null, numero: null, bairro: null, cidade: null, cep: null, syncedAt: null,
+    })
+    await mem.addAtendimento({
+      uuid: 'a1', clienteId: 1, status: 'Concluido', dataRegistro: '2026-08-11',
+      itensProduto: [{ produtoId: 1, quantidade: 2 }], itensServico: [], syncedAt: null,
+    })
+
+    const r = await descarga(mem)
+    expect(r.clientesImportados).toBe(1)
+    expect(r.atendimentosImportados).toBe(1)
+    expect(await mem.getPendingAtendimentos()).toHaveLength(0)
+    expect((await mem.getPendingClientes())[0].syncedAt).not.toBeNull()
+  })
+
+  it('descarga sem pendências retorna zeros', async () => {
+    const mem = createMemoryDb()
+    const r = await descarga(mem)
+    expect(r.atendimentosImportados).toBe(0)
+    expect(r.clientesImportados).toBe(0)
   })
 })

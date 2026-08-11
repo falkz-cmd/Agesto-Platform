@@ -51,5 +51,18 @@ export async function mockFetch<T>(method: string, path: string, body?: unknown)
     return seedAgenda() as T
   }
 
+  if (method === 'POST' && path.startsWith('/api/sync/descarga')) {
+    const b = (body ?? { clientes: [], atendimentos: [] }) as {
+      clientes: unknown[]
+      atendimentos: unknown[]
+    }
+    return {
+      clientesImportados: b.clientes.length,
+      atendimentosImportados: b.atendimentos.length,
+      erros: [],
+      sincronizadoEm: new Date().toISOString(),
+    } as T
+  }
+
   throw new ApiError(404, `Sem mock para ${method} ${path}`)
 }

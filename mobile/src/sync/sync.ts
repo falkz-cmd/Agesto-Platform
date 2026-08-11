@@ -1,7 +1,12 @@
 import { api } from '@/lib/api'
 import { db } from '@/db/instance'
 import type { LocalDb } from '@/db/types'
-import type { AgendaItem, SyncCargaResponse } from '@/types/api'
+import type {
+  AgendaItem,
+  SyncCargaResponse,
+  SyncDescargaRequest,
+  SyncDescargaResponse,
+} from '@/types/api'
 
 export interface CargaResult {
   clientes: number
@@ -51,4 +56,43 @@ export async function initialSync(database: LocalDb = db): Promise<SyncResult> {
   const c = await carga(database)
   const agenda = await syncAgenda(database)
   return { ...c, agenda }
+}
+
+export interface DescargaResult {
+  clientesImportados: number
+  atendimentosImportados: number
+  erros: string[]
+}
+
+/** Descarga: empurra clientes e atendimentos criados offline e marca sincronizado. */
+export async function descarga(database: LocalDb = db): Promise<DescargaResult> {
+  const clientesPend = (await database.getPendingClientes()).filter((c) => c.syncedAt === null)
+  const atendPend = await database.getPendingAtendimentos()
+
+  if (clientesPend.length === 0 && atendPend.length === 0) {
+    return { clientesImportados: 0, atendimentosImportados: 0, erros: [] }
+  }
+
+  const body: SyncDescargaRequest = {
+    clientes: clientesPend.map((c) => ({
+      nome: c.nome, telefone: c.telefone, cpf: c.cpf, logradouro: c.logradouro,
+      numero: c.numero, bairro: c.bairro, cidade: c.cidade, cep: c.cep,
+    })),
+    atendimentos: atendPend.map((a) => ({
+      uuid: a.uuid, dataRegistro: a.dataRegistro, status: a.status, clienteId: a.clienteId,
+      itensProduto: a.itensProduto, itensServico: a.itensServico,
+    })),
+  }
+
+  const res = await api.post<SyncDescargaResponse>('/api/sync/descarga', body)
+
+  await database.markClientesSynced(clientesPend.map((c) => c.uuid), res.sincronizadoEm)
+  await database.markSynced(atendPend.map((a) => a.uuid), res.sincronizadoEm)
+  await database.setMeta('lastSync', res.sincronizadoEm)
+
+  return {
+    clientesImportados: res.clientesImportados,
+    atendimentosImportados: res.atendimentosImportados,
+    erros: res.erros,
+  }
 }
