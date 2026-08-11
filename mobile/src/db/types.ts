@@ -1,4 +1,10 @@
-import type { AgendaItem, Cliente, Produto, Servico, StatusAtendimento } from '@/types/api'
+import type { AgendaItem, Cliente, ClienteInput, Produto, Servico, StatusAtendimento } from '@/types/api'
+
+/** Cliente criado no device (offline). `syncedAt` null = pendente de envio. */
+export interface PendingCliente extends ClienteInput {
+  uuid: string
+  syncedAt: string | null
+}
 
 /**
  * Atendimento criado no device (offline-first). `syncedAt` null = pendente de
@@ -30,6 +36,11 @@ export interface LocalDb {
   getProdutos(): Promise<Produto[]>
   getServicos(): Promise<Servico[]>
   getAgenda(): Promise<AgendaItem[]>
+
+  // clientes criados offline
+  addCliente(c: PendingCliente): Promise<void>
+  getPendingClientes(): Promise<PendingCliente[]>
+  markClientesSynced(uuids: string[], syncedAt: string): Promise<void>
 
   // atendimentos criados offline
   addAtendimento(a: LocalAtendimento): Promise<void>

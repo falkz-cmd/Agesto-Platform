@@ -1,5 +1,5 @@
 import type { AgendaItem, Cliente, Produto, Servico } from '@/types/api'
-import type { LocalDb, LocalAtendimento } from './types'
+import type { LocalDb, LocalAtendimento, PendingCliente } from './types'
 
 const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T
 
@@ -9,6 +9,7 @@ export function createMemoryDb(): LocalDb {
   let produtos: Produto[] = []
   let servicos: Servico[] = []
   let agenda: AgendaItem[] = []
+  let pendingClientes: PendingCliente[] = []
   let atendimentos: LocalAtendimento[] = []
   const meta = new Map<string, string>()
 
@@ -40,6 +41,19 @@ export function createMemoryDb(): LocalDb {
       return clone(agenda)
     },
 
+    async addCliente(c) {
+      pendingClientes.push(clone(c))
+    },
+    async getPendingClientes() {
+      return clone(pendingClientes)
+    },
+    async markClientesSynced(uuids, syncedAt) {
+      const set = new Set(uuids)
+      pendingClientes = pendingClientes.map((c) =>
+        set.has(c.uuid) ? { ...c, syncedAt } : c,
+      )
+    },
+
     async addAtendimento(a) {
       atendimentos.push(clone(a))
     },
@@ -68,6 +82,7 @@ export function createMemoryDb(): LocalDb {
       produtos = []
       servicos = []
       agenda = []
+      pendingClientes = []
       atendimentos = []
       meta.clear()
     },

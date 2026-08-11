@@ -47,4 +47,16 @@ describe('memoryDb', () => {
     expect(await db.getMeta('lastSync')).toBeNull()
     expect(await db.getClientes()).toHaveLength(0)
   })
+
+  it('cliente offline entra pendente e vira sincronizado', async () => {
+    const db = createMemoryDb()
+    await db.addCliente({
+      uuid: 'cx', nome: 'Novo Cliente', cpf: '11122233344', telefone: null,
+      logradouro: null, numero: null, bairro: null, cidade: null, cep: null, syncedAt: null,
+    })
+    expect(await db.getPendingClientes()).toHaveLength(1)
+
+    await db.markClientesSynced(['cx'], '2026-08-11T10:00:00Z')
+    expect((await db.getPendingClientes())[0].syncedAt).toBe('2026-08-11T10:00:00Z')
+  })
 })

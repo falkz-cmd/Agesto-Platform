@@ -32,6 +32,18 @@ export interface Cliente {
   cep: string | null
 }
 
+/** Campos para criar um cliente (espelha ClienteCreateRequest). */
+export interface ClienteInput {
+  nome: string
+  telefone: string | null
+  cpf: string
+  logradouro: string | null
+  numero: string | null
+  bairro: string | null
+  cidade: string | null
+  cep: string | null
+}
+
 export interface Produto {
   id: number
   uuid: string

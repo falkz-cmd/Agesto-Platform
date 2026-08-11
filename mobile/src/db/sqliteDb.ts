@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite'
 import type { AgendaItem, Cliente, Produto, Servico } from '@/types/api'
-import type { LocalDb, LocalAtendimento } from './types'
+import type { LocalDb, LocalAtendimento, PendingCliente } from './types'
 
 type Row = { json: string }
 type AtRow = { json: string; syncedAt: string | null }
@@ -36,6 +36,7 @@ export function createSqliteDb(): LocalDb {
         CREATE TABLE IF NOT EXISTS produtos (id INTEGER PRIMARY KEY, json TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS servicos (id INTEGER PRIMARY KEY, json TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS agenda (id INTEGER PRIMARY KEY, json TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS pending_clientes (uuid TEXT PRIMARY KEY, json TEXT NOT NULL, syncedAt TEXT);
         CREATE TABLE IF NOT EXISTS atendimentos (uuid TEXT PRIMARY KEY, json TEXT NOT NULL, syncedAt TEXT);
         CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
       `)
@@ -49,6 +50,29 @@ export function createSqliteDb(): LocalDb {
     getProdutos: () => getRef<Produto>('produtos'),
     getServicos: () => getRef<Servico>('servicos'),
     getAgenda: () => getRef<AgendaItem>('agenda'),
+
+    async addCliente(c) {
+      const d = await conn()
+      await d.runAsync(
+        `INSERT OR REPLACE INTO pending_clientes (uuid, json, syncedAt) VALUES (?, ?, ?)`,
+        c.uuid,
+        JSON.stringify(c),
+        c.syncedAt,
+      )
+    },
+    async getPendingClientes() {
+      const d = await conn()
+      const rows = await d.getAllAsync<AtRow>(`SELECT json, syncedAt FROM pending_clientes`)
+      return rows.map((r) => ({ ...(JSON.parse(r.json) as PendingCliente), syncedAt: r.syncedAt }))
+    },
+    async markClientesSynced(uuids, syncedAt) {
+      const d = await conn()
+      await d.withTransactionAsync(async () => {
+        for (const uuid of uuids) {
+          await d.runAsync(`UPDATE pending_clientes SET syncedAt = ? WHERE uuid = ?`, syncedAt, uuid)
+        }
+      })
+    },
 
     async addAtendimento(a) {
       const d = await conn()
@@ -90,7 +114,7 @@ export function createSqliteDb(): LocalDb {
 
     async reset() {
       const d = await conn()
-      await d.execAsync(`DELETE FROM clientes; DELETE FROM produtos; DELETE FROM servicos; DELETE FROM agenda; DELETE FROM atendimentos; DELETE FROM meta;`)
+      await d.execAsync(`DELETE FROM clientes; DELETE FROM produtos; DELETE FROM servicos; DELETE FROM agenda; DELETE FROM pending_clientes; DELETE FROM atendimentos; DELETE FROM meta;`)
     },
   }
 }
