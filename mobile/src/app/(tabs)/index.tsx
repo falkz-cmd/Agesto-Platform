@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useRouter, useFocusEffect } from 'expo-router'
 import { Screen } from '@/ui/Screen'
 import { JobCard } from '@/ui/JobCard'
 import { colors, radius, space } from '@/ui/theme'
@@ -13,15 +14,25 @@ function dataHoje(): string {
 }
 
 export default function Inicio() {
+  const router = useRouter()
   const [agenda, setAgenda] = useState<AgendaItem[]>([])
+  const [pending, setPending] = useState(0)
 
-  useEffect(() => {
-    ;(async () => {
-      const items = await db.getAgenda()
-      items.sort((a, b) => String(a.dataAgendada).localeCompare(String(b.dataAgendada)))
-      setAgenda(items)
-    })()
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      let active = true
+      ;(async () => {
+        const [items, pend] = await Promise.all([db.getAgenda(), db.getPendingAtendimentos()])
+        if (!active) return
+        items.sort((a, b) => String(a.dataAgendada).localeCompare(String(b.dataAgendada)))
+        setAgenda(items)
+        setPending(pend.length)
+      })()
+      return () => {
+        active = false
+      }
+    }, []),
+  )
 
   const proximo = agenda[0]
   const resto = agenda.slice(1)
@@ -40,6 +51,7 @@ export default function Inicio() {
 
       <ScrollView contentContainerStyle={styles.body}>
         <Pressable
+          onPress={() => router.push('/registrar')}
           style={({ pressed }) => [styles.register, pressed && { opacity: 0.9 }]}
           accessibilityRole="button"
         >
@@ -51,6 +63,15 @@ export default function Inicio() {
             <Text style={styles.rs}>Novo serviço, agora — em poucos toques</Text>
           </View>
         </Pressable>
+
+        {pending > 0 && (
+          <View style={styles.pending}>
+            <Ionicons name="cloud-upload-outline" size={16} color={colors.warn} />
+            <Text style={styles.pendingText}>
+              {pending} atendimento{pending === 1 ? '' : 's'} pendente{pending === 1 ? '' : 's'} de envio
+            </Text>
+          </View>
+        )}
 
         <View style={styles.today}>
           <Text style={styles.todayDate}>{dataHoje()}</Text>
@@ -103,6 +124,9 @@ const styles = StyleSheet.create({
   plus: { width: 46, height: 46, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
   rt: { color: '#fff', fontSize: 19, fontWeight: '700' },
   rs: { color: 'rgba(255,255,255,0.92)', fontSize: 13, marginTop: 3 },
+
+  pending: { flexDirection: 'row', alignItems: 'center', gap: space(2), backgroundColor: colors.warnSoft, borderRadius: radius.sm, paddingHorizontal: space(3), paddingVertical: space(2.5) },
+  pendingText: { fontSize: 12.5, color: colors.warn, fontWeight: '600' },
 
   today: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space(1) },
   todayDate: { fontSize: 15, fontWeight: '600', color: colors.ink },
