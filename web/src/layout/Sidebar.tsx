@@ -1,9 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { NAV } from './nav'
+import { navVisivel } from './nav'
 import { useAuth } from '../auth/useAuth'
+import { useConfiguracao } from '../features/parametrizacao/queries'
 
 export function Sidebar() {
   const { user, logout } = useAuth()
+  const config = useConfiguracao()
+  const nav = navVisivel(config.data?.tipoOperacao)
   const email = user?.email ?? ''
   const initial = email ? email[0]!.toUpperCase() : '—'
 
@@ -22,7 +25,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      {NAV.map((group) => (
+      {nav.map((group) => (
         <div key={group.label}>
           <div className="px-2.5 pb-[5px] pt-3.5 text-[10px] font-bold uppercase tracking-[0.09em] text-ink-4">
             {group.label}

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import type {
   Cliente,
   Produto,
@@ -9,6 +9,7 @@ import type {
 import { Button, NumberField, Money } from '../../components/ui'
 import { IconPlus, IconTrash } from '../../components/icons'
 import { useServicoSugeridos } from '../servicos/sugeridosQueries'
+import { useConfiguracao } from '../parametrizacao/queries'
 
 const selectCls =
   'rounded-[10px] border border-line bg-surface px-3 py-2.5 text-[14px] text-ink outline-none focus:border-brand'
@@ -60,6 +61,12 @@ export function OrcamentoForm({
   const [draftError, setDraftError] = useState<string | null>(null)
 
   const total = itens.reduce((s, i) => s + i.quantidade * i.precoUnitario, 0)
+
+  const permiteServico = (useConfiguracao().data?.tipoOperacao ?? 'Hibrido') !== 'Venda'
+  useEffect(() => {
+    if (!permiteServico && tipo === 'servico') changeTipo('produto')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [permiteServico])
 
   const servicoSelId = tipo === 'servico' && refId ? Number(refId) : 0
   const sugeridos = useServicoSugeridos(servicoSelId)
@@ -247,7 +254,7 @@ export function OrcamentoForm({
         <div className="flex flex-col gap-3 rounded-sm border border-dashed border-line bg-surface-2 p-3">
           <select value={tipo} onChange={(e) => changeTipo(e.target.value as Tipo)} className={selectCls}>
             <option value="produto">Produto (catálogo)</option>
-            <option value="servico">Serviço (catálogo)</option>
+            {permiteServico && <option value="servico">Serviço (catálogo)</option>}
             <option value="avulso">Item avulso</option>
           </select>
 

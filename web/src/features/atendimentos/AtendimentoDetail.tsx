@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   useItemProdutos,
   useItemServicos,
@@ -57,7 +57,9 @@ export function AtendimentoDetail({
   const rmProd = useRemoveItemProduto(at.id)
   const rmServ = useRemoveItemServico(at.id)
   const toast = useToast()
-  const controlaEstoque = useConfiguracao().data?.controlaEstoque ?? true
+  const config = useConfiguracao().data
+  const controlaEstoque = config?.controlaEstoque ?? true
+  const permiteServico = (config?.tipoOperacao ?? 'Hibrido') !== 'Venda'
 
   const [status, setStatus] = useState<StatusAtendimento>(at.status)
   const [agenda, setAgenda] = useState(toLocalInput(at.dataAgendada))
@@ -82,6 +84,12 @@ export function AtendimentoDetail({
   const servicosDoAtendimento = [...new Set((servs.data ?? []).map((s) => s.servicoId))]
   const alvo = alvoServicoId || servicosDoAtendimento[0] || 0
   const salvarSugeridos = useUpdateServicoSugeridos(alvo)
+
+  // Modo Venda não oferece serviço: garante um tipo válido se a config chegar depois.
+  useEffect(() => {
+    if (!permiteServico && tipo === 'servico') changeTipo('produto')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [permiteServico])
 
   function changeTipo(t: Tipo) {
     setTipo(t)
@@ -251,7 +259,7 @@ export function AtendimentoDetail({
         <div className="flex flex-col gap-3 rounded-sm border border-dashed border-line bg-surface-2 p-3">
           <select value={tipo} onChange={(e) => changeTipo(e.target.value as Tipo)} className={selectCls}>
             <option value="produto">Produto{controlaEstoque ? ' (baixa estoque)' : ''}</option>
-            <option value="servico">Serviço</option>
+            {permiteServico && <option value="servico">Serviço</option>}
             <option value="avulso">Item avulso</option>
           </select>
 
