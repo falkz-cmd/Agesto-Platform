@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import type { TipoOperacao } from '../types/api'
 import {
   IconGrid,
   IconFile,
@@ -51,6 +52,25 @@ export const NAV: NavGroup[] = [
     ],
   },
 ]
+
+/**
+ * Rotas ocultas por modo de operação. Produto NUNCA some — é material/estoque,
+ * não "venda" (DEC-18). No modo Venda (varejo puro) somem Serviços e Agenda.
+ */
+const OCULTAS_POR_MODO: Record<TipoOperacao, string[]> = {
+  Servico: [],
+  Venda: ['/servicos', '/agenda'],
+  Hibrido: [],
+}
+
+/** Navegação filtrada pelo TipoOperacao da empresa (grupos vazios somem). */
+export function navVisivel(tipo: TipoOperacao | undefined): NavGroup[] {
+  const ocultas = tipo ? OCULTAS_POR_MODO[tipo] : []
+  if (ocultas.length === 0) return NAV
+  return NAV.map((g) => ({ ...g, items: g.items.filter((i) => !ocultas.includes(i.to)) })).filter(
+    (g) => g.items.length > 0,
+  )
+}
 
 /** Lookup plano rota -> rótulo, para o título da topbar. */
 export const NAV_TITLES: Record<string, string> = Object.fromEntries(
