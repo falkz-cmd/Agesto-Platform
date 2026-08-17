@@ -25,11 +25,15 @@ export function ServicoSugeridosEditor({ servicoId }: { servicoId: number }) {
     [sugeridos.data],
   )
 
-  useEffect(() => setRows(serverRows), [serverRows])
-
   const nomeDe = (id: number) => produtos.data?.find((p) => p.id === id)?.nome ?? `Produto #${id}`
   const disponiveis = (produtos.data ?? []).filter((p) => !rows.some((r) => r.produtoId === p.id))
   const dirty = norm(rows) !== norm(serverRows)
+
+  // Sincroniza com o servidor só quando não há edição pendente (não clobbera o usuário).
+  useEffect(() => {
+    if (!dirty) setRows(serverRows)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverRows])
 
   function add(produtoId: number) {
     if (!produtoId || rows.some((r) => r.produtoId === produtoId)) return

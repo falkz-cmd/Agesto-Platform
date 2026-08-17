@@ -9,6 +9,8 @@ export function useServicoSugeridos(servicoId: number) {
     queryKey: key(servicoId),
     queryFn: () => api.get<ServicoSugerido[]>(`/api/servico/${servicoId}/sugeridos`),
     enabled: servicoId > 0,
+    // Evita reescrever edições em andamento no editor com um refetch de foco.
+    refetchOnWindowFocus: false,
   })
 }
 
