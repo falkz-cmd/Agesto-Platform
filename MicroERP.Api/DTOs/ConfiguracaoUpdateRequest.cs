@@ -7,4 +7,8 @@ public sealed class ConfiguracaoUpdateRequest
 {
     [Required(ErrorMessage = "TipoOperacao e obrigatorio.")]
     public TipoOperacao? TipoOperacao { get; set; }
+
+    // Opcionais: quando nulos, o campo permanece inalterado.
+    public ModoAgendaAgente? ModoAgendaAgente { get; set; }
+    public bool? ControlaEstoque { get; set; }
 }

@@ -29,6 +29,14 @@ public sealed class ConfiguracaoService : IConfiguracaoService
         }
 
         configuracao.TipoOperacao = request.TipoOperacao!.Value;
+        if (request.ModoAgendaAgente.HasValue)
+        {
+            configuracao.ModoAgendaAgente = request.ModoAgendaAgente.Value;
+        }
+        if (request.ControlaEstoque.HasValue)
+        {
+            configuracao.ControlaEstoque = request.ControlaEstoque.Value;
+        }
         configuracao.UpdatedAt = DateTime.UtcNow;
 
         await _configuracaoRepository.SaveChangesAsync(cancellationToken);
@@ -42,6 +50,8 @@ public sealed class ConfiguracaoService : IConfiguracaoService
         {
             Id = configuracao.Id,
             TipoOperacao = configuracao.TipoOperacao,
+            ModoAgendaAgente = configuracao.ModoAgendaAgente,
+            ControlaEstoque = configuracao.ControlaEstoque,
             EmpresaId = configuracao.EmpresaId,
             CreatedAt = configuracao.CreatedAt,
             UpdatedAt = configuracao.UpdatedAt
