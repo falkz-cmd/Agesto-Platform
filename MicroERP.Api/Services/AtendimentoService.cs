@@ -13,19 +13,29 @@ public sealed class AtendimentoService : IAtendimentoService
     private readonly IItemProdutoRepository _itemProdutoRepository;
     private readonly IItemServicoRepository _itemServicoRepository;
     private readonly IProdutoRepository _produtoRepository;
+    private readonly IConfiguracaoRepository _configuracaoRepository;
 
     public AtendimentoService(
         IAtendimentoRepository atendimentoRepository,
         IClienteRepository clienteRepository,
         IItemProdutoRepository itemProdutoRepository,
         IItemServicoRepository itemServicoRepository,
-        IProdutoRepository produtoRepository)
+        IProdutoRepository produtoRepository,
+        IConfiguracaoRepository configuracaoRepository)
     {
         _atendimentoRepository = atendimentoRepository;
         _clienteRepository = clienteRepository;
         _itemProdutoRepository = itemProdutoRepository;
         _itemServicoRepository = itemServicoRepository;
         _produtoRepository = produtoRepository;
+        _configuracaoRepository = configuracaoRepository;
+    }
+
+    // Default seguro: controla. Quando false, o cancelamento nao devolve estoque.
+    private async Task<bool> ControlaEstoqueAsync(long empresaId, CancellationToken cancellationToken)
+    {
+        var config = await _configuracaoRepository.GetByEmpresaAsync(empresaId, false, cancellationToken);
+        return config?.ControlaEstoque ?? true;
     }
 
     public async Task<IReadOnlyList<AtendimentoResponse>> GetAllAsync(long empresaId, CancellationToken cancellationToken)
@@ -95,11 +105,13 @@ public sealed class AtendimentoService : IAtendimentoService
         var now = DateTime.UtcNow;
 
         // Soft delete e reversão de estoque dos itens de produto
+        var controlaEstoque = await ControlaEstoqueAsync(empresaId, cancellationToken);
         var itensProduto = await _itemProdutoRepository.GetAllByAtendimentoTrackedAsync(atendimento.Id, cancellationToken);
         foreach (var item in itensProduto)
         {
-            // Avulso (sem ProdutoId) nao movimentou estoque, entao nao devolve.
-            if (item.ProdutoId.HasValue)
+            // Devolve estoque só para item de catalogo (avulso nao movimentou) e
+            // apenas quando a empresa controla estoque.
+            if (item.ProdutoId.HasValue && controlaEstoque)
             {
                 var produto = await _produtoRepository.GetByIdAsync(empresaId, item.ProdutoId.Value, true, cancellationToken);
                 if (produto is not null)

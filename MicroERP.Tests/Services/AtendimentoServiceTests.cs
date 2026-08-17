@@ -15,6 +15,7 @@ public sealed class AtendimentoServiceTests
     private readonly Mock<IItemProdutoRepository> _itemProdutoRepoMock = new();
     private readonly Mock<IItemServicoRepository> _itemServicoRepoMock = new();
     private readonly Mock<IProdutoRepository> _produtoRepoMock = new();
+    private readonly Mock<IConfiguracaoRepository> _configuracaoRepoMock = new();
     private readonly AtendimentoService _service;
 
     public AtendimentoServiceTests()
@@ -24,7 +25,8 @@ public sealed class AtendimentoServiceTests
             _clienteRepoMock.Object,
             _itemProdutoRepoMock.Object,
             _itemServicoRepoMock.Object,
-            _produtoRepoMock.Object);
+            _produtoRepoMock.Object,
+            _configuracaoRepoMock.Object);
     }
 
     [Fact]

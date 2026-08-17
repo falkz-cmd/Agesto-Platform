@@ -173,6 +173,11 @@ public sealed class SyncService : ISyncService
         var clientesImportados = 0;
         var atendimentosImportados = 0;
 
+        // Default seguro: controla. Quando false, itens nao baixam nem validam estoque.
+        var controlaEstoque = (await _dbContext.Configuracoes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.EmpresaId == empresaId, cancellationToken))?.ControlaEstoque ?? true;
+
         // Importa clientes novos
         foreach (var clienteRequest in request.Clientes)
         {
@@ -236,14 +241,17 @@ public sealed class SyncService : ISyncService
                         continue;
                     }
 
-                    if (produto.QuantidadeEstoque < itemProduto.Quantidade)
+                    if (controlaEstoque && produto.QuantidadeEstoque < itemProduto.Quantidade)
                     {
                         erros.Add($"Atendimento '{atendimentoRequest.Uuid}': Estoque insuficiente para produto '{produto.Nome}'.");
                         continue;
                     }
 
-                    produto.QuantidadeEstoque -= itemProduto.Quantidade;
-                    produto.UpdatedAt = DateTime.UtcNow;
+                    if (controlaEstoque)
+                    {
+                        produto.QuantidadeEstoque -= itemProduto.Quantidade;
+                        produto.UpdatedAt = DateTime.UtcNow;
+                    }
 
                     var subtotal = itemProduto.Quantidade * produto.Preco;
                     totalProdutos += subtotal;
