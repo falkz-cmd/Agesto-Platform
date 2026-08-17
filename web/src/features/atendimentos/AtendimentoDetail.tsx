@@ -12,7 +12,7 @@ import { Button, Money, NumberField, useToast } from '../../components/ui'
 import { IconPlus, IconTrash } from '../../components/icons'
 import { ApiError } from '../../lib/api'
 import { useConfiguracao } from '../parametrizacao/queries'
-import { useServicoSugeridos } from '../servicos/sugeridosQueries'
+import { useServicoSugeridos, useUpdateServicoSugeridos } from '../servicos/sugeridosQueries'
 import type {
   Atendimento,
   Produto,
@@ -73,6 +73,15 @@ export function AtendimentoDetail({
   // Materiais sugeridos do serviço selecionado no formulário de adicionar item.
   const servicoSelId = tipo === 'servico' && refId ? Number(refId) : 0
   const sugeridos = useServicoSugeridos(servicoSelId)
+
+  // kit-04: salvar os materiais deste atendimento como sugeridos de um serviço.
+  const [alvoServicoId, setAlvoServicoId] = useState(0)
+  const materiaisDoAtendimento = (prods.data ?? [])
+    .filter((p) => p.produtoId != null)
+    .map((p) => ({ produtoId: p.produtoId as number, quantidadePadrao: p.quantidade }))
+  const servicosDoAtendimento = [...new Set((servs.data ?? []).map((s) => s.servicoId))]
+  const alvo = alvoServicoId || servicosDoAtendimento[0] || 0
+  const salvarSugeridos = useUpdateServicoSugeridos(alvo)
 
   function changeTipo(t: Tipo) {
     setTipo(t)
@@ -145,6 +154,14 @@ export function AtendimentoDetail({
       })
     }
     if (list.length > 0) toast.success(`${list.length} material(is) adicionado(s).`)
+  }
+
+  function salvarComoSugeridos() {
+    if (alvo <= 0 || materiaisDoAtendimento.length === 0) return
+    salvarSugeridos.mutate(materiaisDoAtendimento, {
+      onSuccess: () => toast.success('Materiais salvos como sugeridos do serviço.'),
+      onError: (e) => toast.error(e instanceof ApiError ? e.message : 'Não foi possível salvar.'),
+    })
   }
 
   const itensLoading = prods.isLoading || servs.isLoading
@@ -311,6 +328,38 @@ export function AtendimentoDetail({
             <IconPlus className="h-4 w-4" /> Adicionar item
           </Button>
         </div>
+
+        {/* Salvar materiais como sugeridos de um serviço (kit-04) */}
+        {materiaisDoAtendimento.length > 0 && servicosDoAtendimento.length > 0 && (
+          <div className="flex flex-col gap-2 rounded-sm border border-line bg-surface-2 px-3 py-3">
+            <span className="text-[12px] font-semibold text-ink-2">Salvar materiais como sugeridos</span>
+            <p className="text-[11.5px] text-ink-4">
+              Guarda os {materiaisDoAtendimento.length} material(is) deste atendimento como kit de um serviço
+              (substitui o kit atual dele).
+            </p>
+            <div className="flex items-center gap-2">
+              <select
+                value={alvo}
+                onChange={(e) => setAlvoServicoId(Number(e.target.value))}
+                className={`${selectCls} flex-1`}
+              >
+                {servicosDoAtendimento.map((sid) => (
+                  <option key={sid} value={sid}>
+                    {servicos.find((s) => s.id === sid)?.descricao ?? `Serviço #${sid}`}
+                  </option>
+                ))}
+              </select>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={salvarComoSugeridos}
+                disabled={salvarSugeridos.isPending}
+              >
+                {salvarSugeridos.isPending ? 'Salvando…' : 'Salvar kit'}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Status / reagendamento */}
         <div className="flex flex-col gap-3 border-t border-line pt-4">
