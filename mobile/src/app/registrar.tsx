@@ -8,8 +8,10 @@ import { colors, radius, space } from '@/ui/theme'
 import { db } from '@/db/instance'
 import { buildAtendimento, hasItems, type QtyMap } from '@/features/registrar/buildAtendimento'
 import { getConfig, DEFAULT_CONFIG } from '@/lib/appConfig'
+import { getSugeridos } from '@/lib/sugeridos'
 import { isoAgendada, diaLabel } from '@/features/registrar/agendar'
-import type { Cliente, Configuracao, Produto, Servico, StatusAtendimento } from '@/types/api'
+import { materiaisSugeridos } from '@/features/registrar/sugeridos'
+import type { Cliente, Configuracao, Produto, Servico, ServicoSugerido, StatusAtendimento } from '@/types/api'
 
 const brl = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
@@ -35,6 +37,7 @@ export default function Registrar() {
 
   const [config, setConfig] = useState<Configuracao>(DEFAULT_CONFIG)
   const [configLoaded, setConfigLoaded] = useState(false)
+  const [sugeridos, setSugeridos] = useState<ServicoSugerido[]>([])
   const [modo, setModo] = useState<'agora' | 'agendar'>(params.modo === 'agendar' ? 'agendar' : 'agora')
   const [diaOffset, setDiaOffset] = useState(0)
   const [hora, setHora] = useState('09:00')
@@ -45,9 +48,23 @@ export default function Registrar() {
       setProdutos(await db.getProdutos())
       setServicos(await db.getServicos())
       setConfig(await getConfig(db))
+      setSugeridos(await getSugeridos(db))
       setConfigLoaded(true)
     })()
   }, [])
+
+  // Materiais sugeridos dos serviços selecionados que existem no catálogo local.
+  const materiais = materiaisSugeridos(sugeridos, servicoQty).filter((m) =>
+    produtos.some((p) => p.id === m.produtoId),
+  )
+
+  function addSugeridos() {
+    setProdutoQty((m) => {
+      const next = { ...m }
+      for (const it of materiais) next[it.produtoId] = Math.max(next[it.produtoId] ?? 0, it.quantidade)
+      return next
+    })
+  }
 
   // Agendar só existe no modo Flexível (solo); no Fixa o agente só registra/conclui (walk-in).
   // Só depois da config carregar, pra não piscar o segmento em empresas Fixa.
@@ -174,6 +191,16 @@ export default function Registrar() {
           ))}
         </View>
 
+        {/* Materiais sugeridos dos serviços escolhidos */}
+        {materiais.length > 0 && (
+          <Pressable onPress={addSugeridos} style={({ pressed }) => [styles.sugerido, pressed && { opacity: 0.9 }]}>
+            <Ionicons name="add-circle-outline" size={18} color={colors.brandInk} />
+            <Text style={styles.sugeridoText}>
+              Materiais sugeridos ({materiais.length})
+            </Text>
+          </Pressable>
+        )}
+
         {/* Produtos */}
         <Text style={styles.label}>Produtos</Text>
         <View style={{ gap: space(2) }}>
@@ -262,6 +289,8 @@ const styles = StyleSheet.create({
   rowTitle: { fontSize: 15, fontWeight: '600', color: colors.ink },
   rowSub: { fontSize: 12.5, color: colors.ink3, marginTop: 2 },
 
+  sugerido: { flexDirection: 'row', alignItems: 'center', gap: space(2), backgroundColor: colors.brandSoft, borderRadius: radius.sm, paddingHorizontal: space(3.5), paddingVertical: space(3), alignSelf: 'flex-start' },
+  sugeridoText: { fontSize: 13.5, fontWeight: '700', color: colors.brandInk },
   chip: { paddingHorizontal: space(3.5), paddingVertical: space(2.25), borderRadius: radius.pill, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line },
   chipOn: { backgroundColor: colors.brandSoft, borderColor: colors.brand },
   chipText: { fontSize: 13.5, fontWeight: '600', color: colors.ink3 },
