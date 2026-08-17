@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using MicroERP.Api.Data;
+using MicroERP.Api.DTOs;
 using MicroERP.Api.Enums;
 using MicroERP.Api.Models;
 using MicroERP.Api.Repositories;
@@ -48,6 +50,102 @@ public sealed class SyncServiceTests
         Assert.Equal(5, carga.Orcamentos[0].Itens[0].ServicoId);
     }
 
+    [Fact]
+    public async Task CargaAsync_IncluiConfiguracaoDaEmpresa()
+    {
+        await using var db = CreateContext();
+        db.Configuracoes.Add(new Configuracao
+        {
+            Id = 1,
+            EmpresaId = 1,
+            TipoOperacao = TipoOperacao.Servico,
+            ModoAgendaAgente = ModoAgendaAgente.Fixa,
+            ControlaEstoque = false,
+        });
+        await db.SaveChangesAsync();
+
+        var carga = await BuildSync(db).CargaAsync(1, null, CancellationToken.None);
+
+        Assert.NotNull(carga.Configuracao);
+        Assert.Equal(ModoAgendaAgente.Fixa, carga.Configuracao!.ModoAgendaAgente);
+        Assert.False(carga.Configuracao.ControlaEstoque);
+    }
+
+    [Fact]
+    public async Task CargaAsync_SemConfiguracao_RetornaPadraoSeguro()
+    {
+        await using var db = CreateContext();
+
+        var carga = await BuildSync(db).CargaAsync(1, null, CancellationToken.None);
+
+        Assert.NotNull(carga.Configuracao);
+        Assert.Equal(ModoAgendaAgente.Flexivel, carga.Configuracao!.ModoAgendaAgente);
+        Assert.True(carga.Configuracao.ControlaEstoque);
+    }
+
+    [Fact]
+    public async Task DescargaAsync_ModoFixa_IgnoraDataAgendada()
+    {
+        await using var db = CreateContext();
+        db.Configuracoes.Add(new Configuracao { Id = 1, EmpresaId = 1, ModoAgendaAgente = ModoAgendaAgente.Fixa, ControlaEstoque = true });
+        await db.SaveChangesAsync();
+
+        var req = new SyncDescargaRequest
+        {
+            Clientes = [],
+            Atendimentos =
+            [
+                new AtendimentoSyncRequest
+                {
+                    Uuid = Guid.NewGuid(),
+                    DataRegistro = DateTime.UtcNow,
+                    DataAgendada = DateTime.UtcNow.AddDays(2),
+                    Status = StatusAtendimento.Pendente,
+                    ClienteId = 1,
+                    ItensProduto = [],
+                    ItensServico = [],
+                },
+            ],
+        };
+
+        var res = await BuildSync(db).DescargaAsync(1, 1, req, CancellationToken.None);
+
+        Assert.Equal(1, res.AtendimentosImportados);
+        var at = await db.Atendimentos.FirstAsync();
+        Assert.Null(at.DataAgendada); // Fixa: agendamento vindo do agente é ignorado no servidor
+    }
+
+    [Fact]
+    public async Task DescargaAsync_ModoFlexivel_MantemDataAgendada()
+    {
+        await using var db = CreateContext();
+        db.Configuracoes.Add(new Configuracao { Id = 1, EmpresaId = 1, ModoAgendaAgente = ModoAgendaAgente.Flexivel });
+        await db.SaveChangesAsync();
+
+        var req = new SyncDescargaRequest
+        {
+            Clientes = [],
+            Atendimentos =
+            [
+                new AtendimentoSyncRequest
+                {
+                    Uuid = Guid.NewGuid(),
+                    DataRegistro = DateTime.UtcNow,
+                    DataAgendada = DateTime.UtcNow.AddDays(2),
+                    Status = StatusAtendimento.Pendente,
+                    ClienteId = 1,
+                    ItensProduto = [],
+                    ItensServico = [],
+                },
+            ],
+        };
+
+        await BuildSync(db).DescargaAsync(1, 1, req, CancellationToken.None);
+
+        var at = await db.Atendimentos.FirstAsync();
+        Assert.NotNull(at.DataAgendada); // Flexível: agendamento do agente é preservado
+    }
+
     private static SyncService BuildSync(AppDbContext db)
     {
         var clienteRepo = new ClienteRepository(db);
@@ -65,5 +163,6 @@ public sealed class SyncServiceTests
     private static AppDbContext CreateContext() =>
         new(new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options);
 }

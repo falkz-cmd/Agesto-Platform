@@ -1,6 +1,7 @@
 import { describe, it, expect } from '@jest/globals'
 import { carga, initialSync, descarga } from './sync'
 import { createMemoryDb } from '@/db/memoryDb'
+import { getConfig, DEFAULT_CONFIG } from '@/lib/appConfig'
 
 describe('sync.carga (mock)', () => {
   it('popula o banco injetado com os dados de referência e marca lastSync', async () => {
@@ -15,6 +16,24 @@ describe('sync.carga (mock)', () => {
     const clientes = await mem.getClientes()
     expect(clientes[0].nome).toBe('Vó Joana')
     expect(await mem.getMeta('lastSync')).not.toBeNull()
+  })
+
+  it('carga salva a configuração da empresa vinda do servidor', async () => {
+    const mem = createMemoryDb()
+    await mem.init()
+
+    await carga(mem)
+
+    const config = await getConfig(mem)
+    expect(config.modoAgendaAgente).toBe('Flexivel')
+    expect(config.controlaEstoque).toBe(true)
+  })
+
+  it('getConfig devolve o default seguro quando não há config local', async () => {
+    const mem = createMemoryDb()
+    await mem.init()
+
+    expect(await getConfig(mem)).toEqual(DEFAULT_CONFIG)
   })
 
   it('initialSync popula referência e agenda do dia', async () => {
@@ -37,7 +56,7 @@ describe('sync.carga (mock)', () => {
       logradouro: null, numero: null, bairro: null, cidade: null, cep: null, syncedAt: null,
     })
     await mem.addAtendimento({
-      uuid: 'a1', clienteId: 1, status: 'Concluido', dataRegistro: '2026-08-11',
+      uuid: 'a1', clienteId: 1, status: 'Concluido', dataRegistro: '2026-08-11', dataAgendada: null,
       itensProduto: [{ produtoId: 1, quantidade: 2 }], itensServico: [], syncedAt: null,
     })
 

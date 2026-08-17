@@ -258,10 +258,11 @@ public sealed class OrcamentoServiceTests
         var itemProdutoRepo = new ItemProdutoRepository(db);
         var itemServicoRepo = new ItemServicoRepository(db);
         var orcamentoRepo = new OrcamentoRepository(db);
+        var configuracaoRepo = new ConfiguracaoRepository(db);
 
-        var itemProdutoService = new ItemProdutoService(itemProdutoRepo, atendimentoRepo, produtoRepo, itemServicoRepo);
+        var itemProdutoService = new ItemProdutoService(itemProdutoRepo, atendimentoRepo, produtoRepo, itemServicoRepo, configuracaoRepo);
         var itemServicoService = new ItemServicoService(itemServicoRepo, atendimentoRepo, servicoRepo, itemProdutoRepo);
-        var atendimentoService = new AtendimentoService(atendimentoRepo, clienteRepo, itemProdutoRepo, itemServicoRepo, produtoRepo);
+        var atendimentoService = new AtendimentoService(atendimentoRepo, clienteRepo, itemProdutoRepo, itemServicoRepo, produtoRepo, configuracaoRepo);
 
         return new OrcamentoService(db, orcamentoRepo, clienteRepo, atendimentoService, itemProdutoService, itemServicoService);
     }

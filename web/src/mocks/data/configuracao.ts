@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import type { Configuracao, TipoOperacao } from '../../types/api'
+import type { Configuracao, ConfiguracaoPatch } from '../../types/api'
 import { ok } from '../lib/http'
 
 const now = new Date().toISOString()
@@ -8,6 +8,8 @@ const now = new Date().toISOString()
 let config: Configuracao = {
   id: 1,
   tipoOperacao: 'Servico',
+  modoAgendaAgente: 'Flexivel',
+  controlaEstoque: true,
   empresaId: 1,
   createdAt: now,
   updatedAt: now,
@@ -16,8 +18,14 @@ let config: Configuracao = {
 export const configuracaoHandlers = [
   http.get('*/api/configuracao', () => HttpResponse.json(ok(config, 'Configuração encontrada.'))),
   http.put('*/api/configuracao', async ({ request }) => {
-    const body = (await request.json()) as { tipoOperacao: TipoOperacao }
-    config = { ...config, tipoOperacao: body.tipoOperacao, updatedAt: new Date().toISOString() }
+    const body = (await request.json()) as ConfiguracaoPatch
+    config = {
+      ...config,
+      ...(body.tipoOperacao !== undefined && { tipoOperacao: body.tipoOperacao }),
+      ...(body.modoAgendaAgente !== undefined && { modoAgendaAgente: body.modoAgendaAgente }),
+      ...(body.controlaEstoque !== undefined && { controlaEstoque: body.controlaEstoque }),
+      updatedAt: new Date().toISOString(),
+    }
     return HttpResponse.json(ok(config, 'Configuração atualizada.'))
   }),
 ]

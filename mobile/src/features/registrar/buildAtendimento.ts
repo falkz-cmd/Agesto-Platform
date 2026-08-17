@@ -9,6 +9,8 @@ export interface RegistroInput {
   status: StatusAtendimento
   servicoQty: QtyMap
   produtoQty: QtyMap
+  /** Quando informado, o atendimento é agendado para essa data (futuro). */
+  dataAgendada?: string | null
 }
 
 /** Verdadeiro se há ao menos um item (serviço ou produto) com quantidade > 0. */
@@ -29,6 +31,7 @@ export function buildAtendimento(input: RegistroInput): LocalAtendimento {
     clienteId: input.clienteId,
     status: input.status,
     dataRegistro: new Date().toISOString(),
+    dataAgendada: input.dataAgendada ?? null,
     itensProduto: toItens(input.produtoQty).map((x) => ({ produtoId: x.id, quantidade: x.quantidade })),
     itensServico: toItens(input.servicoQty).map((x) => ({ servicoId: x.id, quantidade: x.quantidade })),
     syncedAt: null,

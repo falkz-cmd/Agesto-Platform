@@ -131,12 +131,38 @@ public sealed class SyncService : ISyncService
             })
             .ToList();
 
+        // Configuracao da empresa — o mobile precisa dela para saber o modo de
+        // agenda (Flexivel/Fixa) e se controla estoque. Vai em toda Carga (nao
+        // depende de UpdatedAt: e um unico registro pequeno e sempre relevante).
+        var configuracao = await _dbContext.Configuracoes
+            .AsNoTracking()
+            .Where(c => c.EmpresaId == empresaId)
+            .Select(c => new ConfiguracaoResponse
+            {
+                Id = c.Id,
+                TipoOperacao = c.TipoOperacao,
+                ModoAgendaAgente = c.ModoAgendaAgente,
+                ControlaEstoque = c.ControlaEstoque,
+                EmpresaId = c.EmpresaId,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
+            })
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? new ConfiguracaoResponse
+            {
+                EmpresaId = empresaId,
+                TipoOperacao = TipoOperacao.Servico,
+                ModoAgendaAgente = ModoAgendaAgente.Flexivel,
+                ControlaEstoque = true
+            };
+
         return new SyncCargaResponse
         {
             Clientes = clientes,
             Produtos = produtos,
             Servicos = servicos,
             Orcamentos = orcamentos,
+            Configuracao = configuracao,
             SincronizadoEm = DateTime.UtcNow
         };
     }
@@ -146,6 +172,15 @@ public sealed class SyncService : ISyncService
         var erros = new List<string>();
         var clientesImportados = 0;
         var atendimentosImportados = 0;
+
+        var config = await _dbContext.Configuracoes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.EmpresaId == empresaId, cancellationToken);
+        // Default seguro: controla. Quando false, itens nao baixam nem validam estoque.
+        var controlaEstoque = config?.ControlaEstoque ?? true;
+        // Modo Fixa: o agente nao pode agendar (walk-in liberado). Enforcement de
+        // servidor — ignora DataAgendada vinda do device, mesmo em payload forjado.
+        var agendaFixa = config?.ModoAgendaAgente == ModoAgendaAgente.Fixa;
 
         // Importa clientes novos
         foreach (var clienteRequest in request.Clientes)
@@ -190,6 +225,7 @@ public sealed class SyncService : ISyncService
                     ClienteId = atendimentoRequest.ClienteId,
                     Status = atendimentoRequest.Status,
                     DataRegistro = atendimentoRequest.DataRegistro,
+                    DataAgendada = agendaFixa ? null : atendimentoRequest.DataAgendada,
                     ValorTotal = 0m,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -210,14 +246,17 @@ public sealed class SyncService : ISyncService
                         continue;
                     }
 
-                    if (produto.QuantidadeEstoque < itemProduto.Quantidade)
+                    if (controlaEstoque && produto.QuantidadeEstoque < itemProduto.Quantidade)
                     {
                         erros.Add($"Atendimento '{atendimentoRequest.Uuid}': Estoque insuficiente para produto '{produto.Nome}'.");
                         continue;
                     }
 
-                    produto.QuantidadeEstoque -= itemProduto.Quantidade;
-                    produto.UpdatedAt = DateTime.UtcNow;
+                    if (controlaEstoque)
+                    {
+                        produto.QuantidadeEstoque -= itemProduto.Quantidade;
+                        produto.UpdatedAt = DateTime.UtcNow;
+                    }
 
                     var subtotal = itemProduto.Quantidade * produto.Preco;
                     totalProdutos += subtotal;

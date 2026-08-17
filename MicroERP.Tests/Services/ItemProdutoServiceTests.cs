@@ -13,6 +13,7 @@ public sealed class ItemProdutoServiceTests
     private readonly Mock<IAtendimentoRepository> _atendimentoRepoMock = new();
     private readonly Mock<IProdutoRepository> _produtoRepoMock = new();
     private readonly Mock<IItemServicoRepository> _itemServicoRepoMock = new();
+    private readonly Mock<IConfiguracaoRepository> _configuracaoRepoMock = new();
     private readonly ItemProdutoService _service;
 
     public ItemProdutoServiceTests()
@@ -21,7 +22,8 @@ public sealed class ItemProdutoServiceTests
             _itemProdutoRepoMock.Object,
             _atendimentoRepoMock.Object,
             _produtoRepoMock.Object,
-            _itemServicoRepoMock.Object);
+            _itemServicoRepoMock.Object,
+            _configuracaoRepoMock.Object);
     }
 
     [Fact]
@@ -74,6 +76,36 @@ public sealed class ItemProdutoServiceTests
 
         await Assert.ThrowsAsync<EstoqueInsuficienteException>(() =>
             _service.CreateAsync(1, new ItemProdutoCreateRequest { AtendimentoId = 1, ProdutoId = 5, Quantidade = 5 }, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task CreateAsync_WhenControlaEstoqueFalse_DoesNotValidateNorDeductStock()
+    {
+        var atendimento = new Atendimento { Id = 1 };
+        var produto = new Produto { Id = 5, Nome = "Produto A", QuantidadeEstoque = 1, Preco = 20m };
+
+        _atendimentoRepoMock
+            .Setup(r => r.GetByIdAsync(1, 1, true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(atendimento);
+        _produtoRepoMock
+            .Setup(r => r.GetByIdAsync(1, 5, true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(produto);
+        _configuracaoRepoMock
+            .Setup(r => r.GetByEmpresaAsync(1, false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Configuracao { EmpresaId = 1, ControlaEstoque = false });
+        _itemProdutoRepoMock
+            .Setup(r => r.SumSubtotalByAtendimentoAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(100m);
+        _itemServicoRepoMock
+            .Setup(r => r.SumSubtotalByAtendimentoAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0m);
+
+        // Quantidade (5) > estoque (1): sem controle de estoque, nao valida nem baixa.
+        var result = await _service.CreateAsync(1, new ItemProdutoCreateRequest { AtendimentoId = 1, ProdutoId = 5, Quantidade = 5 }, CancellationToken.None);
+
+        Assert.Equal(1, produto.QuantidadeEstoque); // inalterado
+        Assert.Equal(20m, result.PrecoUnitario);    // ainda usa o preco do catalogo
+        _itemProdutoRepoMock.Verify(r => r.AddAsync(It.IsAny<ItemProduto>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

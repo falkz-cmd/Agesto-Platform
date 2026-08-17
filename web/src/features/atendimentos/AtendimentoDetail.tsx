@@ -11,6 +11,7 @@ import { StatusAtendimentoPill } from './status'
 import { Button, Money, NumberField, useToast } from '../../components/ui'
 import { IconPlus, IconTrash } from '../../components/icons'
 import { ApiError } from '../../lib/api'
+import { useConfiguracao } from '../parametrizacao/queries'
 import type {
   Atendimento,
   Produto,
@@ -55,6 +56,7 @@ export function AtendimentoDetail({
   const rmProd = useRemoveItemProduto(at.id)
   const rmServ = useRemoveItemServico(at.id)
   const toast = useToast()
+  const controlaEstoque = useConfiguracao().data?.controlaEstoque ?? true
 
   const [status, setStatus] = useState<StatusAtendimento>(at.status)
   const [agenda, setAgenda] = useState(toLocalInput(at.dataAgendada))
@@ -210,7 +212,7 @@ export function AtendimentoDetail({
         {/* Adicionar item */}
         <div className="flex flex-col gap-3 rounded-sm border border-dashed border-line bg-surface-2 p-3">
           <select value={tipo} onChange={(e) => changeTipo(e.target.value as Tipo)} className={selectCls}>
-            <option value="produto">Produto (baixa estoque)</option>
+            <option value="produto">Produto{controlaEstoque ? ' (baixa estoque)' : ''}</option>
             <option value="servico">Serviço</option>
             <option value="avulso">Item avulso</option>
           </select>
@@ -220,7 +222,8 @@ export function AtendimentoDetail({
               <option value="">Escolha o produto…</option>
               {produtos.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.nome} ({p.quantidadeEstoque} em estoque)
+                  {p.nome}
+                  {controlaEstoque ? ` (${p.quantidadeEstoque} em estoque)` : ''}
                 </option>
               ))}
             </select>

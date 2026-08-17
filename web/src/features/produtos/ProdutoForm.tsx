@@ -20,12 +20,14 @@ export function ProdutoForm({
   submitting,
   serverError,
   onCancel,
+  controlaEstoque = true,
 }: {
   initial: Produto | null
   onSubmit: (input: ProdutoInput) => void
   submitting: boolean
   serverError?: string | null
   onCancel: () => void
+  controlaEstoque?: boolean
 }) {
   const [form, setForm] = useState<FormState>(() => toState(initial))
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -36,10 +38,13 @@ export function ProdutoForm({
     if (nome.length < 2) e.nome = 'Nome deve ter no mínimo 2 caracteres.'
     else if (nome.length > 120) e.nome = 'Nome deve ter no máximo 120 caracteres.'
     if (form.preco === undefined || form.preco < 0.01) e.preco = 'Preço deve ser maior que zero.'
-    if (form.quantidadeEstoque === undefined || form.quantidadeEstoque < 0)
-      e.quantidadeEstoque = 'Quantidade inválida.'
-    else if (!Number.isInteger(form.quantidadeEstoque))
-      e.quantidadeEstoque = 'Quantidade deve ser um número inteiro.'
+    // Estoque só é validado quando a empresa controla estoque.
+    if (controlaEstoque) {
+      if (form.quantidadeEstoque === undefined || form.quantidadeEstoque < 0)
+        e.quantidadeEstoque = 'Quantidade inválida.'
+      else if (!Number.isInteger(form.quantidadeEstoque))
+        e.quantidadeEstoque = 'Quantidade deve ser um número inteiro.'
+    }
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -50,7 +55,8 @@ export function ProdutoForm({
     onSubmit({
       nome: form.nome.trim(),
       preco: form.preco!,
-      quantidadeEstoque: form.quantidadeEstoque!,
+      // Sem controle de estoque: preserva o valor atual (edição) ou 0 (novo).
+      quantidadeEstoque: controlaEstoque ? form.quantidadeEstoque! : (form.quantidadeEstoque ?? 0),
     })
   }
 
@@ -71,7 +77,7 @@ export function ProdutoForm({
           required
           maxLength={120}
         />
-        <div className="grid grid-cols-2 gap-3">
+        <div className={controlaEstoque ? 'grid grid-cols-2 gap-3' : ''}>
           <NumberField
             label="Preço"
             prefix="R$"
@@ -81,14 +87,16 @@ export function ProdutoForm({
             error={errors.preco}
             required
           />
-          <NumberField
-            label="Estoque"
-            step={1}
-            value={form.quantidadeEstoque}
-            onChange={(v) => setForm((f) => ({ ...f, quantidadeEstoque: v }))}
-            error={errors.quantidadeEstoque}
-            required
-          />
+          {controlaEstoque && (
+            <NumberField
+              label="Estoque"
+              step={1}
+              value={form.quantidadeEstoque}
+              onChange={(v) => setForm((f) => ({ ...f, quantidadeEstoque: v }))}
+              error={errors.quantidadeEstoque}
+              required
+            />
+          )}
         </div>
       </div>
 
