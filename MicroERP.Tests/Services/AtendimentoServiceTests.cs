@@ -112,6 +112,11 @@ public sealed class AtendimentoServiceTests
             .Setup(r => r.GetAllByAtendimentoTrackedAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync([itemServico]);
 
+        // Explícito: empresa controla estoque, então o cancelamento devolve o saldo.
+        _configuracaoRepoMock
+            .Setup(r => r.GetByEmpresaAsync(1, false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Configuracao { EmpresaId = 1, ControlaEstoque = true });
+
         await _service.DeleteAsync(1, 1, CancellationToken.None);
 
         Assert.NotNull(atendimento.DeletedAt);

@@ -34,6 +34,7 @@ export default function Registrar() {
   const [saving, setSaving] = useState(false)
 
   const [config, setConfig] = useState<Configuracao>(DEFAULT_CONFIG)
+  const [configLoaded, setConfigLoaded] = useState(false)
   const [modo, setModo] = useState<'agora' | 'agendar'>(params.modo === 'agendar' ? 'agendar' : 'agora')
   const [diaOffset, setDiaOffset] = useState(0)
   const [hora, setHora] = useState('09:00')
@@ -44,11 +45,13 @@ export default function Registrar() {
       setProdutos(await db.getProdutos())
       setServicos(await db.getServicos())
       setConfig(await getConfig(db))
+      setConfigLoaded(true)
     })()
   }, [])
 
   // Agendar só existe no modo Flexível (solo); no Fixa o agente só registra/conclui (walk-in).
-  const podeAgendar = config.modoAgendaAgente === 'Flexivel'
+  // Só depois da config carregar, pra não piscar o segmento em empresas Fixa.
+  const podeAgendar = configLoaded && config.modoAgendaAgente === 'Flexivel'
   const agendando = podeAgendar && modo === 'agendar'
   const dataAgendada = agendando ? isoAgendada(diaOffset, hora) : null
 
