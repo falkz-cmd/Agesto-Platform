@@ -46,6 +46,8 @@ builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IServicoRepository, ServicoRepository>();
 builder.Services.AddScoped<IServicoService, ServicoService>();
+builder.Services.AddScoped<IServicoSugeridoRepository, ServicoSugeridoRepository>();
+builder.Services.AddScoped<IServicoSugeridoService, ServicoSugeridoService>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<IProdutoService, ProdutoService>();
 builder.Services.AddScoped<IAtendimentoRepository, AtendimentoRepository>();
