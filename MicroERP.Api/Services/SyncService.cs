@@ -173,10 +173,14 @@ public sealed class SyncService : ISyncService
         var clientesImportados = 0;
         var atendimentosImportados = 0;
 
-        // Default seguro: controla. Quando false, itens nao baixam nem validam estoque.
-        var controlaEstoque = (await _dbContext.Configuracoes
+        var config = await _dbContext.Configuracoes
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.EmpresaId == empresaId, cancellationToken))?.ControlaEstoque ?? true;
+            .FirstOrDefaultAsync(c => c.EmpresaId == empresaId, cancellationToken);
+        // Default seguro: controla. Quando false, itens nao baixam nem validam estoque.
+        var controlaEstoque = config?.ControlaEstoque ?? true;
+        // Modo Fixa: o agente nao pode agendar (walk-in liberado). Enforcement de
+        // servidor — ignora DataAgendada vinda do device, mesmo em payload forjado.
+        var agendaFixa = config?.ModoAgendaAgente == ModoAgendaAgente.Fixa;
 
         // Importa clientes novos
         foreach (var clienteRequest in request.Clientes)
@@ -221,7 +225,7 @@ public sealed class SyncService : ISyncService
                     ClienteId = atendimentoRequest.ClienteId,
                     Status = atendimentoRequest.Status,
                     DataRegistro = atendimentoRequest.DataRegistro,
-                    DataAgendada = atendimentoRequest.DataAgendada,
+                    DataAgendada = agendaFixa ? null : atendimentoRequest.DataAgendada,
                     ValorTotal = 0m,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
