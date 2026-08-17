@@ -98,6 +98,7 @@ export interface SyncCargaResponse {
 export interface AtendimentoSyncRequest {
   uuid: string
   dataRegistro: string
+  dataAgendada?: string | null
   status: StatusAtendimento
   clienteId: number
   itensProduto: { produtoId: number; quantidade: number }[]

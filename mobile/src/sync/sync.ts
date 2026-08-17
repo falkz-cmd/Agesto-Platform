@@ -83,7 +83,8 @@ export async function descarga(database: LocalDb = db): Promise<DescargaResult> 
       numero: c.numero, bairro: c.bairro, cidade: c.cidade, cep: c.cep,
     })),
     atendimentos: atendPend.map((a) => ({
-      uuid: a.uuid, dataRegistro: a.dataRegistro, status: a.status, clienteId: a.clienteId,
+      uuid: a.uuid, dataRegistro: a.dataRegistro, dataAgendada: a.dataAgendada,
+      status: a.status, clienteId: a.clienteId,
       itensProduto: a.itensProduto, itensServico: a.itensServico,
     })),
   }

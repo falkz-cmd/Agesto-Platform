@@ -15,6 +15,8 @@ export interface LocalAtendimento {
   clienteId: number
   status: StatusAtendimento
   dataRegistro: string
+  /** Data agendada (futuro) — null quando é registro imediato. */
+  dataAgendada: string | null
   itensProduto: { produtoId: number; quantidade: number }[]
   itensServico: { servicoId: number; quantidade: number }[]
   syncedAt: string | null

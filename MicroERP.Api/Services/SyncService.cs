@@ -221,6 +221,7 @@ public sealed class SyncService : ISyncService
                     ClienteId = atendimentoRequest.ClienteId,
                     Status = atendimentoRequest.Status,
                     DataRegistro = atendimentoRequest.DataRegistro,
+                    DataAgendada = atendimentoRequest.DataAgendada,
                     ValorTotal = 0m,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow

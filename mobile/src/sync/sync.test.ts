@@ -56,7 +56,7 @@ describe('sync.carga (mock)', () => {
       logradouro: null, numero: null, bairro: null, cidade: null, cep: null, syncedAt: null,
     })
     await mem.addAtendimento({
-      uuid: 'a1', clienteId: 1, status: 'Concluido', dataRegistro: '2026-08-11',
+      uuid: 'a1', clienteId: 1, status: 'Concluido', dataRegistro: '2026-08-11', dataAgendada: null,
       itensProduto: [{ produtoId: 1, quantidade: 2 }], itensServico: [], syncedAt: null,
     })
 
