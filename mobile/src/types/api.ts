@@ -18,6 +18,16 @@ export interface AuthResponse {
 export type StatusAtendimento = 'Pendente' | 'Concluido' | 'Cancelado'
 export type TipoCobranca = 'PorHora' | 'Empreitada'
 export type StatusOrcamento = 'Rascunho' | 'Enviado' | 'Aprovado' | 'Recusado'
+export type TipoOperacao = 'Venda' | 'Servico' | 'Hibrido'
+/** Flexivel: agente registra e agenda em campo. Fixa: só executa a agenda do Dono. */
+export type ModoAgendaAgente = 'Flexivel' | 'Fixa'
+
+/** Configuração da empresa que o mobile precisa conhecer (vem na Carga). */
+export interface Configuracao {
+  tipoOperacao: TipoOperacao
+  modoAgendaAgente: ModoAgendaAgente
+  controlaEstoque: boolean
+}
 
 export interface Cliente {
   id: number
@@ -80,6 +90,7 @@ export interface SyncCargaResponse {
   clientes: Cliente[]
   produtos: Produto[]
   servicos: Servico[]
+  configuracao?: Configuracao | null
   sincronizadoEm: string
 }
 

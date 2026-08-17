@@ -48,6 +48,39 @@ public sealed class SyncServiceTests
         Assert.Equal(5, carga.Orcamentos[0].Itens[0].ServicoId);
     }
 
+    [Fact]
+    public async Task CargaAsync_IncluiConfiguracaoDaEmpresa()
+    {
+        await using var db = CreateContext();
+        db.Configuracoes.Add(new Configuracao
+        {
+            Id = 1,
+            EmpresaId = 1,
+            TipoOperacao = TipoOperacao.Servico,
+            ModoAgendaAgente = ModoAgendaAgente.Fixa,
+            ControlaEstoque = false,
+        });
+        await db.SaveChangesAsync();
+
+        var carga = await BuildSync(db).CargaAsync(1, null, CancellationToken.None);
+
+        Assert.NotNull(carga.Configuracao);
+        Assert.Equal(ModoAgendaAgente.Fixa, carga.Configuracao!.ModoAgendaAgente);
+        Assert.False(carga.Configuracao.ControlaEstoque);
+    }
+
+    [Fact]
+    public async Task CargaAsync_SemConfiguracao_RetornaPadraoSeguro()
+    {
+        await using var db = CreateContext();
+
+        var carga = await BuildSync(db).CargaAsync(1, null, CancellationToken.None);
+
+        Assert.NotNull(carga.Configuracao);
+        Assert.Equal(ModoAgendaAgente.Flexivel, carga.Configuracao!.ModoAgendaAgente);
+        Assert.True(carga.Configuracao.ControlaEstoque);
+    }
+
     private static SyncService BuildSync(AppDbContext db)
     {
         var clienteRepo = new ClienteRepository(db);
