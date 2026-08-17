@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
-import type { Configuracao, TipoOperacao } from '../../types/api'
+import type { Configuracao, ConfiguracaoPatch } from '../../types/api'
 
 const KEY = ['configuracao'] as const
 
@@ -11,8 +11,7 @@ export function useConfiguracao() {
 export function useUpdateConfiguracao() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (tipoOperacao: TipoOperacao) =>
-      api.put<Configuracao>('/api/configuracao', { tipoOperacao }),
+    mutationFn: (patch: ConfiguracaoPatch) => api.put<Configuracao>('/api/configuracao', patch),
     onSuccess: (data) => qc.setQueryData(KEY, data),
   })
 }
