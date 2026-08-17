@@ -12,6 +12,7 @@ import { Button, Money, NumberField, useToast } from '../../components/ui'
 import { IconPlus, IconTrash } from '../../components/icons'
 import { ApiError } from '../../lib/api'
 import { useConfiguracao } from '../parametrizacao/queries'
+import { useServicoSugeridos } from '../servicos/sugeridosQueries'
 import type {
   Atendimento,
   Produto,
@@ -69,6 +70,10 @@ export function AtendimentoDetail({
   const [custo, setCusto] = useState<number | undefined>(undefined)
   const [draftError, setDraftError] = useState<string | null>(null)
 
+  // Materiais sugeridos do serviço selecionado no formulário de adicionar item.
+  const servicoSelId = tipo === 'servico' && refId ? Number(refId) : 0
+  const sugeridos = useServicoSugeridos(servicoSelId)
+
   function changeTipo(t: Tipo) {
     setTipo(t)
     setRefId('')
@@ -124,6 +129,22 @@ export function AtendimentoDetail({
       { atendimentoId: at.id, produtoId, descricao: desc, precoUnitario: preco, custo: custo ?? null, quantidade: qtd },
       { onSuccess: () => { toast.success('Item adicionado.'); resetDraft() }, onError },
     )
+  }
+
+  function addSugeridos() {
+    const list = sugeridos.data ?? []
+    for (const s of list) {
+      const p = produtos.find((x) => x.id === s.produtoId)
+      addProd.mutate({
+        atendimentoId: at.id,
+        produtoId: s.produtoId,
+        descricao: null,
+        precoUnitario: p?.preco ?? 0,
+        custo: null,
+        quantidade: s.quantidadePadrao,
+      })
+    }
+    if (list.length > 0) toast.success(`${list.length} material(is) adicionado(s).`)
   }
 
   const itensLoading = prods.isLoading || servs.isLoading
@@ -237,6 +258,28 @@ export function AtendimentoDetail({
                 </option>
               ))}
             </select>
+          )}
+
+          {tipo === 'servico' && servicoSelId > 0 && (sugeridos.data?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-2 rounded-sm border border-brand/30 bg-brand-soft px-3 py-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-semibold text-brand-ink">
+                  Materiais sugeridos ({sugeridos.data!.length})
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={addSugeridos}
+                  disabled={addProd.isPending}
+                  className="!py-1 !text-[12px]"
+                >
+                  <IconPlus className="h-3.5 w-3.5" /> Adicionar
+                </Button>
+              </div>
+              <span className="text-[11.5px] text-ink-3">
+                {sugeridos.data!.map((s) => `${s.produtoNome} ×${s.quantidadePadrao}`).join(' · ')}
+              </span>
+            </div>
           )}
           {tipo === 'avulso' && (
             <input
