@@ -5,7 +5,7 @@ import { dashboardMock } from './data/dashboard'
 import { DEMO_EMAIL, DEMO_SENHA, buildMockJwt } from './data/auth'
 import { clienteHandlers } from './data/clientes'
 import { produtoHandlers } from './data/produtos'
-import { servicoHandlers } from './data/servicos'
+import { servicoHandlers, servicoSugeridoHandlers } from './data/servicos'
 import { agendaHandlers } from './data/agenda'
 import { atendimentoHandlers } from './data/atendimentos'
 import { orcamentoHandlers } from './data/orcamentos'
@@ -39,6 +39,8 @@ export const handlers = [
   // Cadastros (CRUD stateful)
   ...clienteHandlers,
   ...produtoHandlers,
+  // Sugeridos antes do CRUD genérico de serviço (path mais específico)
+  ...servicoSugeridoHandlers,
   ...servicoHandlers,
   ...orcamentoHandlers,
   ...configuracaoHandlers,
