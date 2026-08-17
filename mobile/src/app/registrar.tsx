@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native'
+import { View, Text, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
+import { useRouter, useLocalSearchParams } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { Stepper } from '@/ui/Stepper'
 import { colors, radius, space } from '@/ui/theme'
 import { db } from '@/db/instance'
 import { buildAtendimento, hasItems, type QtyMap } from '@/features/registrar/buildAtendimento'
-import type { Cliente, Produto, Servico, StatusAtendimento } from '@/types/api'
+import { getConfig, DEFAULT_CONFIG } from '@/lib/appConfig'
+import { isoAgendada, diaLabel } from '@/features/registrar/agendar'
+import type { Cliente, Configuracao, Produto, Servico, StatusAtendimento } from '@/types/api'
 
 const brl = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
@@ -20,6 +22,7 @@ function enderecoResumo(c: Cliente): string {
 
 export default function Registrar() {
   const router = useRouter()
+  const params = useLocalSearchParams<{ modo?: string }>()
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [servicos, setServicos] = useState<Servico[]>([])
@@ -30,13 +33,24 @@ export default function Registrar() {
   const [status, setStatus] = useState<StatusAtendimento>('Concluido')
   const [saving, setSaving] = useState(false)
 
+  const [config, setConfig] = useState<Configuracao>(DEFAULT_CONFIG)
+  const [modo, setModo] = useState<'agora' | 'agendar'>(params.modo === 'agendar' ? 'agendar' : 'agora')
+  const [diaOffset, setDiaOffset] = useState(0)
+  const [hora, setHora] = useState('09:00')
+
   useEffect(() => {
     ;(async () => {
       setClientes(await db.getClientes())
       setProdutos(await db.getProdutos())
       setServicos(await db.getServicos())
+      setConfig(await getConfig(db))
     })()
   }, [])
+
+  // Agendar só existe no modo Flexível (solo); no Fixa o agente só registra/conclui (walk-in).
+  const podeAgendar = config.modoAgendaAgente === 'Flexivel'
+  const agendando = podeAgendar && modo === 'agendar'
+  const dataAgendada = agendando ? isoAgendada(diaOffset, hora) : null
 
   const estimate = useMemo(() => {
     const s = servicos.reduce((acc, sv) => acc + (servicoQty[sv.id] || 0) * (sv.valorHora ?? sv.valorEmpreitada ?? 0), 0)
@@ -44,13 +58,26 @@ export default function Registrar() {
     return s + p
   }, [servicos, produtos, servicoQty, produtoQty])
 
-  const podeSalvar = clienteId !== undefined && hasItems(servicoQty, produtoQty) && !saving
+  const podeSalvar =
+    clienteId !== undefined &&
+    hasItems(servicoQty, produtoQty) &&
+    (!agendando || dataAgendada !== null) &&
+    !saving
 
   async function salvar() {
     if (clienteId === undefined) return
+    if (agendando && dataAgendada === null) return
     setSaving(true)
     try {
-      await db.addAtendimento(buildAtendimento({ clienteId, status, servicoQty, produtoQty }))
+      await db.addAtendimento(
+        buildAtendimento({
+          clienteId,
+          status: agendando ? 'Pendente' : status,
+          servicoQty,
+          produtoQty,
+          dataAgendada,
+        }),
+      )
       router.back()
     } finally {
       setSaving(false)
@@ -67,6 +94,44 @@ export default function Registrar() {
       </View>
 
       <ScrollView contentContainerStyle={styles.body}>
+        {/* Modo: registrar agora vs agendar (só no modo Flexível) */}
+        {podeAgendar && (
+          <View style={styles.seg}>
+            {(['agora', 'agendar'] as const).map((m) => (
+              <Pressable key={m} onPress={() => setModo(m)} style={[styles.segBtn, modo === m && styles.segBtnOn]}>
+                <Text style={[styles.segText, modo === m && styles.segTextOn]}>
+                  {m === 'agora' ? 'Registrar agora' : 'Agendar'}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+
+        {/* Seletor de agenda */}
+        {agendando && (
+          <View style={{ gap: space(2.5) }}>
+            <Text style={styles.label}>Quando</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space(2) }}>
+              {[0, 1, 2, 3, 4, 5, 6].map((off) => (
+                <Pressable key={off} onPress={() => setDiaOffset(off)} style={[styles.chip, diaOffset === off && styles.chipOn]}>
+                  <Text style={[styles.chipText, diaOffset === off && styles.chipTextOn]}>{diaLabel(off)}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+            <View style={styles.horaRow}>
+              <Text style={styles.horaLabel}>Horário</Text>
+              <TextInput
+                value={hora}
+                onChangeText={setHora}
+                placeholder="09:00"
+                keyboardType="numbers-and-punctuation"
+                maxLength={5}
+                style={[styles.horaInput, dataAgendada === null && styles.horaInputErr]}
+              />
+            </View>
+          </View>
+        )}
+
         {/* Cliente */}
         <Text style={styles.label}>Cliente</Text>
         <View style={{ gap: space(2) }}>
@@ -114,7 +179,8 @@ export default function Registrar() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.rowTitle}>{p.nome}</Text>
                 <Text style={styles.rowSub}>
-                  {brl(p.preco)} · {p.quantidadeEstoque} em estoque
+                  {brl(p.preco)}
+                  {config.controlaEstoque ? ` · ${p.quantidadeEstoque} em estoque` : ''}
                 </Text>
               </View>
               <Stepper value={produtoQty[p.id] || 0} onChange={(v) => setProdutoQty((m) => ({ ...m, [p.id]: v }))} />
@@ -122,21 +188,25 @@ export default function Registrar() {
           ))}
         </View>
 
-        {/* Status */}
-        <Text style={styles.label}>Status</Text>
-        <View style={styles.seg}>
-          {(['Concluido', 'Pendente'] as StatusAtendimento[]).map((s) => (
-            <Pressable
-              key={s}
-              onPress={() => setStatus(s)}
-              style={[styles.segBtn, status === s && styles.segBtnOn]}
-            >
-              <Text style={[styles.segText, status === s && styles.segTextOn]}>
-                {s === 'Concluido' ? 'Concluído' : 'Pendente'}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        {/* Status — oculto ao agendar (agendamento entra como Pendente) */}
+        {!agendando && (
+          <>
+            <Text style={styles.label}>Status</Text>
+            <View style={styles.seg}>
+              {(['Concluido', 'Pendente'] as StatusAtendimento[]).map((s) => (
+                <Pressable
+                  key={s}
+                  onPress={() => setStatus(s)}
+                  style={[styles.segBtn, status === s && styles.segBtnOn]}
+                >
+                  <Text style={[styles.segText, status === s && styles.segTextOn]}>
+                    {s === 'Concluido' ? 'Concluído' : 'Pendente'}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </>
+        )}
       </ScrollView>
 
       <View style={styles.footer}>
@@ -149,7 +219,9 @@ export default function Registrar() {
           disabled={!podeSalvar}
           style={({ pressed }) => [styles.save, (!podeSalvar || pressed) && { opacity: 0.6 }]}
         >
-          <Text style={styles.saveText}>{saving ? 'Salvando…' : 'Salvar atendimento'}</Text>
+          <Text style={styles.saveText}>
+            {saving ? 'Salvando…' : agendando ? 'Agendar atendimento' : 'Salvar atendimento'}
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -186,6 +258,15 @@ const styles = StyleSheet.create({
   rowOn: { borderColor: colors.brand, backgroundColor: colors.brandSoft },
   rowTitle: { fontSize: 15, fontWeight: '600', color: colors.ink },
   rowSub: { fontSize: 12.5, color: colors.ink3, marginTop: 2 },
+
+  chip: { paddingHorizontal: space(3.5), paddingVertical: space(2.25), borderRadius: radius.pill, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line },
+  chipOn: { backgroundColor: colors.brandSoft, borderColor: colors.brand },
+  chipText: { fontSize: 13.5, fontWeight: '600', color: colors.ink3 },
+  chipTextOn: { color: colors.brandInk },
+  horaRow: { flexDirection: 'row', alignItems: 'center', gap: space(3) },
+  horaLabel: { fontSize: 13.5, color: colors.ink2, fontWeight: '600' },
+  horaInput: { flex: 0, minWidth: 80, textAlign: 'center', fontSize: 15, fontWeight: '600', color: colors.ink, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, paddingVertical: space(2), paddingHorizontal: space(3) },
+  horaInputErr: { borderColor: colors.bad },
 
   seg: { flexDirection: 'row', backgroundColor: colors.surface2, borderRadius: radius.sm, padding: 3, gap: 3 },
   segBtn: { flex: 1, paddingVertical: space(2.5), borderRadius: radius.sm - 3, alignItems: 'center' },
