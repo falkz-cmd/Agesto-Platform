@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import type { Servico, ServicoInput, TipoCobranca } from '../../types/api'
 import { Button, TextField, NumberField, SelectField } from '../../components/ui'
+import { ServicoSugeridosEditor } from './ServicoSugeridosEditor'
 
 interface FormState {
   descricao: string
@@ -93,6 +94,8 @@ export function ServicoForm({
           required
         />
       </div>
+
+      {initial && <ServicoSugeridosEditor servicoId={initial.id} />}
 
       <div className="flex justify-end gap-2 border-t border-line px-5 py-4">
         <Button variant="ghost" type="button" onClick={onCancel} disabled={submitting}>

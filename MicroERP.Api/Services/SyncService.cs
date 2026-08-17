@@ -131,6 +131,20 @@ public sealed class SyncService : ISyncService
             })
             .ToList();
 
+        // Materiais sugeridos (kit) de todos os serviços da empresa — o agente
+        // vê e adiciona em campo, offline. Achatado (servicoId, produtoId, qtd).
+        var sugeridos = await _dbContext.ServicoItemSugeridos
+            .AsNoTracking()
+            .Where(s => s.EmpresaId == empresaId)
+            .OrderBy(s => s.ServicoId)
+            .Select(s => new SyncSugeridoResponse
+            {
+                ServicoId = s.ServicoId,
+                ProdutoId = s.ProdutoId,
+                QuantidadePadrao = s.QuantidadePadrao,
+            })
+            .ToListAsync(cancellationToken);
+
         // Configuracao da empresa — o mobile precisa dela para saber o modo de
         // agenda (Flexivel/Fixa) e se controla estoque. Vai em toda Carga (nao
         // depende de UpdatedAt: e um unico registro pequeno e sempre relevante).
@@ -162,6 +176,7 @@ public sealed class SyncService : ISyncService
             Produtos = produtos,
             Servicos = servicos,
             Orcamentos = orcamentos,
+            Sugeridos = sugeridos,
             Configuracao = configuracao,
             SincronizadoEm = DateTime.UtcNow
         };

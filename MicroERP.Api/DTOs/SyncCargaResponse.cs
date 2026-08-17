@@ -8,6 +8,7 @@ public sealed class SyncCargaResponse
     public IReadOnlyList<ProdutoResponse> Produtos { get; set; } = [];
     public IReadOnlyList<ServicoResponse> Servicos { get; set; } = [];
     public IReadOnlyList<OrcamentoResponse> Orcamentos { get; set; } = [];
+    public IReadOnlyList<SyncSugeridoResponse> Sugeridos { get; set; } = [];
     public ConfiguracaoResponse? Configuracao { get; set; }
     public DateTime SincronizadoEm { get; set; }
 }

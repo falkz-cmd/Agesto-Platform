@@ -12,10 +12,12 @@ namespace MicroERP.Api.Controllers;
 public sealed class ServicoController : ApiControllerBase
 {
     private readonly IServicoService _servicoService;
+    private readonly IServicoSugeridoService _servicoSugeridoService;
 
-    public ServicoController(IServicoService servicoService)
+    public ServicoController(IServicoService servicoService, IServicoSugeridoService servicoSugeridoService)
     {
         _servicoService = servicoService;
+        _servicoSugeridoService = servicoSugeridoService;
     }
 
     [HttpGet]
@@ -87,6 +89,42 @@ public sealed class ServicoController : ApiControllerBase
         {
             await _servicoService.DeleteAsync(empresaId, id, cancellationToken);
             return Ok(new ApiResponse { Success = true, Message = "Servico removido com sucesso." });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new ApiResponse { Success = false, Message = ex.Message });
+        }
+    }
+
+    // ---- Materiais sugeridos (kit) do serviço ----
+
+    [HttpGet("{id:long}/sugeridos")]
+    public async Task<ActionResult<ApiResponse>> GetSugeridos(long id, CancellationToken cancellationToken)
+    {
+        if (!TryGetEmpresaId(out var empresaId))
+            return Unauthorized(new ApiResponse { Success = false, Message = "Empresa nao identificada no token." });
+
+        try
+        {
+            var sugeridos = await _servicoSugeridoService.GetByServicoAsync(empresaId, id, cancellationToken);
+            return Ok(new ApiResponse { Success = true, Message = "Materiais sugeridos encontrados.", Data = sugeridos });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new ApiResponse { Success = false, Message = ex.Message });
+        }
+    }
+
+    [HttpPut("{id:long}/sugeridos")]
+    public async Task<ActionResult<ApiResponse>> PutSugeridos(long id, [FromBody] List<ServicoSugeridoRequest> request, CancellationToken cancellationToken)
+    {
+        if (!TryGetEmpresaId(out var empresaId))
+            return Unauthorized(new ApiResponse { Success = false, Message = "Empresa nao identificada no token." });
+
+        try
+        {
+            var sugeridos = await _servicoSugeridoService.ReplaceAsync(empresaId, id, request, cancellationToken);
+            return Ok(new ApiResponse { Success = true, Message = "Materiais sugeridos atualizados.", Data = sugeridos });
         }
         catch (NotFoundException ex)
         {

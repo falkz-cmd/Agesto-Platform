@@ -23,6 +23,11 @@ export function seedCarga(): SyncCargaResponse {
     clientes,
     produtos,
     servicos,
+    // Instalação de AC (s1) costuma usar suporte (p1) ×2 e cano de dreno (p3) ×1.
+    sugeridos: [
+      { servicoId: 1, produtoId: 1, quantidadePadrao: 2 },
+      { servicoId: 1, produtoId: 3, quantidadePadrao: 1 },
+    ],
     configuracao: { tipoOperacao: 'Servico', modoAgendaAgente: 'Flexivel', controlaEstoque: true },
     sincronizadoEm: new Date().toISOString(),
   }

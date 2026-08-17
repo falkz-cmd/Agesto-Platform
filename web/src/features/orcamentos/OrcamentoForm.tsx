@@ -8,6 +8,7 @@ import type {
 } from '../../types/api'
 import { Button, NumberField, Money } from '../../components/ui'
 import { IconPlus, IconTrash } from '../../components/icons'
+import { useServicoSugeridos } from '../servicos/sugeridosQueries'
 
 const selectCls =
   'rounded-[10px] border border-line bg-surface px-3 py-2.5 text-[14px] text-ink outline-none focus:border-brand'
@@ -59,6 +60,30 @@ export function OrcamentoForm({
   const [draftError, setDraftError] = useState<string | null>(null)
 
   const total = itens.reduce((s, i) => s + i.quantidade * i.precoUnitario, 0)
+
+  const servicoSelId = tipo === 'servico' && refId ? Number(refId) : 0
+  const sugeridos = useServicoSugeridos(servicoSelId)
+
+  function addSugeridos() {
+    const list = sugeridos.data ?? []
+    setItens((prev) => [
+      ...prev,
+      ...list
+        .filter((s) => !prev.some((i) => i.produtoId === s.produtoId))
+        .map((s) => {
+          const p = produtos.find((x) => x.id === s.produtoId)
+          return {
+            key: crypto.randomUUID(),
+            produtoId: s.produtoId,
+            servicoId: null,
+            descricao: null,
+            label: p?.nome ?? s.produtoNome,
+            quantidade: s.quantidadePadrao,
+            precoUnitario: p?.preco ?? 0,
+          }
+        }),
+    ])
+  }
 
   function changeTipo(t: Tipo) {
     setTipo(t)
@@ -245,6 +270,22 @@ export function OrcamentoForm({
                 </option>
               ))}
             </select>
+          )}
+
+          {tipo === 'servico' && servicoSelId > 0 && (sugeridos.data?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-2 rounded-sm border border-brand/30 bg-brand-soft px-3 py-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-semibold text-brand-ink">
+                  Materiais sugeridos ({sugeridos.data!.length})
+                </span>
+                <Button type="button" variant="ghost" onClick={addSugeridos} className="!py-1 !text-[12px]">
+                  <IconPlus className="h-3.5 w-3.5" /> Adicionar
+                </Button>
+              </div>
+              <span className="text-[11.5px] text-ink-3">
+                {sugeridos.data!.map((s) => `${s.produtoNome} ×${s.quantidadePadrao}`).join(' · ')}
+              </span>
+            </div>
           )}
           {tipo === 'avulso' && (
             <input

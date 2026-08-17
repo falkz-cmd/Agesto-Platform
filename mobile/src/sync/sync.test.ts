@@ -2,6 +2,7 @@ import { describe, it, expect } from '@jest/globals'
 import { carga, initialSync, descarga } from './sync'
 import { createMemoryDb } from '@/db/memoryDb'
 import { getConfig, DEFAULT_CONFIG } from '@/lib/appConfig'
+import { getSugeridos } from '@/lib/sugeridos'
 
 describe('sync.carga (mock)', () => {
   it('popula o banco injetado com os dados de referência e marca lastSync', async () => {
@@ -34,6 +35,18 @@ describe('sync.carga (mock)', () => {
     await mem.init()
 
     expect(await getConfig(mem)).toEqual(DEFAULT_CONFIG)
+  })
+
+  it('carga salva os materiais sugeridos vindos do servidor', async () => {
+    const mem = createMemoryDb()
+    await mem.init()
+
+    await carga(mem)
+
+    const sugeridos = await getSugeridos(mem)
+    expect(sugeridos.length).toBeGreaterThan(0)
+    expect(sugeridos[0]).toHaveProperty('servicoId')
+    expect(sugeridos[0]).toHaveProperty('produtoId')
   })
 
   it('initialSync popula referência e agenda do dia', async () => {
