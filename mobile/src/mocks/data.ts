@@ -19,7 +19,13 @@ const servicos: Servico[] = [
 ]
 
 export function seedCarga(): SyncCargaResponse {
-  return { clientes, produtos, servicos, sincronizadoEm: new Date().toISOString() }
+  return {
+    clientes,
+    produtos,
+    servicos,
+    configuracao: { tipoOperacao: 'Servico', modoAgendaAgente: 'Flexivel', controlaEstoque: true },
+    sincronizadoEm: new Date().toISOString(),
+  }
 }
 
 function hoje(hour: number, min = 0): string {

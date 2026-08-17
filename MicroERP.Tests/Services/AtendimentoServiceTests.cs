@@ -15,6 +15,7 @@ public sealed class AtendimentoServiceTests
     private readonly Mock<IItemProdutoRepository> _itemProdutoRepoMock = new();
     private readonly Mock<IItemServicoRepository> _itemServicoRepoMock = new();
     private readonly Mock<IProdutoRepository> _produtoRepoMock = new();
+    private readonly Mock<IConfiguracaoRepository> _configuracaoRepoMock = new();
     private readonly AtendimentoService _service;
 
     public AtendimentoServiceTests()
@@ -24,7 +25,8 @@ public sealed class AtendimentoServiceTests
             _clienteRepoMock.Object,
             _itemProdutoRepoMock.Object,
             _itemServicoRepoMock.Object,
-            _produtoRepoMock.Object);
+            _produtoRepoMock.Object,
+            _configuracaoRepoMock.Object);
     }
 
     [Fact]
@@ -109,6 +111,11 @@ public sealed class AtendimentoServiceTests
         _itemServicoRepoMock
             .Setup(r => r.GetAllByAtendimentoTrackedAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync([itemServico]);
+
+        // Explícito: empresa controla estoque, então o cancelamento devolve o saldo.
+        _configuracaoRepoMock
+            .Setup(r => r.GetByEmpresaAsync(1, false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Configuracao { EmpresaId = 1, ControlaEstoque = true });
 
         await _service.DeleteAsync(1, 1, CancellationToken.None);
 

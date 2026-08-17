@@ -1,10 +1,12 @@
 import { useCallback, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
-import { useFocusEffect } from 'expo-router'
+import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import { useFocusEffect, useRouter } from 'expo-router'
 import { Screen } from '@/ui/Screen'
 import { JobCard } from '@/ui/JobCard'
-import { colors, space } from '@/ui/theme'
+import { colors, radius, space } from '@/ui/theme'
 import { db } from '@/db/instance'
+import { getConfig } from '@/lib/appConfig'
 import type { AgendaItem } from '@/types/api'
 
 interface DayGroup {
@@ -58,15 +60,18 @@ function agrupar(items: AgendaItem[]): DayGroup[] {
 }
 
 export default function Agenda() {
+  const router = useRouter()
   const [groups, setGroups] = useState<DayGroup[]>([])
+  const [podeAgendar, setPodeAgendar] = useState(false)
 
   useFocusEffect(
     useCallback(() => {
       let active = true
       ;(async () => {
-        const items = await db.getAgenda()
+        const [items, config] = await Promise.all([db.getAgenda(), getConfig(db)])
         if (!active) return
         setGroups(agrupar(items))
+        setPodeAgendar(config.modoAgendaAgente === 'Flexivel')
       })()
       return () => {
         active = false
@@ -79,8 +84,19 @@ export default function Agenda() {
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={styles.title}>Agenda</Text>
-        <Text style={styles.count}>{total} agendado{total === 1 ? '' : 's'}</Text>
+        <View>
+          <Text style={styles.title}>Agenda</Text>
+          <Text style={styles.count}>{total} agendado{total === 1 ? '' : 's'}</Text>
+        </View>
+        {podeAgendar && (
+          <Pressable
+            onPress={() => router.push('/registrar?modo=agendar')}
+            style={({ pressed }) => [styles.novo, pressed && { opacity: 0.9 }]}
+          >
+            <Ionicons name="add" size={18} color="#fff" />
+            <Text style={styles.novoText}>Agendar</Text>
+          </Pressable>
+        )}
       </View>
 
       <ScrollView contentContainerStyle={styles.body}>
@@ -111,7 +127,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.line2,
   },
   title: { fontSize: 18, fontWeight: '700', color: colors.ink },
-  count: { fontSize: 13, color: colors.ink3 },
+  count: { fontSize: 13, color: colors.ink3, marginTop: 2 },
+  novo: { flexDirection: 'row', alignItems: 'center', gap: space(1.5), backgroundColor: colors.brand, borderRadius: radius.sm, paddingHorizontal: space(3), paddingVertical: space(2) },
+  novoText: { color: '#fff', fontWeight: '700', fontSize: 13.5 },
 
   body: { padding: space(4), gap: space(4) },
   group: { gap: space(2.5) },

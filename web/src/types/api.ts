@@ -227,14 +227,22 @@ export interface AtendimentoResumo {
 /* ---------- Configuração (parametrização da empresa) ---------- */
 
 export type TipoOperacao = 'Venda' | 'Servico' | 'Hibrido'
+export type ModoAgendaAgente = 'Flexivel' | 'Fixa'
 
 export interface Configuracao {
   id: number
   tipoOperacao: TipoOperacao
+  modoAgendaAgente: ModoAgendaAgente
+  controlaEstoque: boolean
   empresaId: number
   createdAt: string
   updatedAt: string
 }
+
+/** Campos editáveis da configuração (patch parcial no PUT). */
+export type ConfiguracaoPatch = Partial<
+  Pick<Configuracao, 'tipoOperacao' | 'modoAgendaAgente' | 'controlaEstoque'>
+>
 
 /* ---------- Atendimento (execução) ---------- */
 

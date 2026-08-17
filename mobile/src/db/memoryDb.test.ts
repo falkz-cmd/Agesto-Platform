@@ -28,7 +28,7 @@ describe('memoryDb', () => {
   it('atendimento offline entra pendente e vira sincronizado', async () => {
     const db = createMemoryDb()
     await db.addAtendimento({
-      uuid: 'a1', clienteId: 1, status: 'Concluido', dataRegistro: '2026-08-05',
+      uuid: 'a1', clienteId: 1, status: 'Concluido', dataRegistro: '2026-08-05', dataAgendada: null,
       itensProduto: [{ produtoId: 1, quantidade: 2 }], itensServico: [], syncedAt: null,
     })
     expect(await db.getPendingAtendimentos()).toHaveLength(1)

@@ -23,5 +23,18 @@ describe('buildAtendimento', () => {
     expect(a.syncedAt).toBeNull()
     expect(a.uuid).toBeTruthy()
     expect(a.dataRegistro).toBeTruthy()
+    expect(a.dataAgendada).toBeNull() // registro imediato: sem data agendada
+  })
+
+  it('agenda quando dataAgendada é informada', () => {
+    const a = buildAtendimento({
+      clienteId: 1,
+      status: 'Pendente',
+      servicoQty: { 2: 1 },
+      produtoQty: {},
+      dataAgendada: '2026-08-20T14:00:00.000Z',
+    })
+    expect(a.dataAgendada).toBe('2026-08-20T14:00:00.000Z')
+    expect(a.status).toBe('Pendente')
   })
 })

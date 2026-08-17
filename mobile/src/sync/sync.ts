@@ -1,5 +1,6 @@
 import { api } from '@/lib/api'
 import { db } from '@/db/instance'
+import { saveConfig } from '@/lib/appConfig'
 import type { LocalDb } from '@/db/types'
 import type {
   AgendaItem,
@@ -31,6 +32,9 @@ export async function carga(database: LocalDb = db): Promise<CargaResult> {
   await database.saveClientes(data.clientes)
   await database.saveProdutos(data.produtos)
   await database.saveServicos(data.servicos)
+  if (data.configuracao) {
+    await saveConfig(database, data.configuracao)
+  }
   await database.setMeta('lastSync', data.sincronizadoEm)
 
   return {
@@ -79,7 +83,8 @@ export async function descarga(database: LocalDb = db): Promise<DescargaResult> 
       numero: c.numero, bairro: c.bairro, cidade: c.cidade, cep: c.cep,
     })),
     atendimentos: atendPend.map((a) => ({
-      uuid: a.uuid, dataRegistro: a.dataRegistro, status: a.status, clienteId: a.clienteId,
+      uuid: a.uuid, dataRegistro: a.dataRegistro, dataAgendada: a.dataAgendada,
+      status: a.status, clienteId: a.clienteId,
       itensProduto: a.itensProduto, itensServico: a.itensServico,
     })),
   }

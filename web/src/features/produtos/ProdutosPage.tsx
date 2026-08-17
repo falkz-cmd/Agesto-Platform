@@ -14,6 +14,7 @@ import {
 } from '../../components/ui'
 import { IconPlus, IconPencil, IconTrash } from '../../components/icons'
 import { ApiError } from '../../lib/api'
+import { useConfiguracao } from '../parametrizacao/queries'
 import type { Produto, ProdutoInput } from '../../types/api'
 
 const iconBtn =
@@ -25,6 +26,8 @@ export function ProdutosPage() {
   const update = produtosResource.useUpdate()
   const remove = produtosResource.useRemove()
   const toast = useToast()
+  const config = useConfiguracao()
+  const controlaEstoque = config.data?.controlaEstoque ?? true
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editing, setEditing] = useState<Produto | null>(null)
@@ -72,16 +75,20 @@ export function ProdutosPage() {
   const columns: Column<Produto>[] = [
     { header: 'Nome', cell: (p) => <span className="font-medium text-ink">{p.nome}</span> },
     { header: 'Preço', align: 'right', cell: (p) => <Money value={p.preco} cents /> },
-    {
-      header: 'Estoque',
-      align: 'right',
-      cell: (p) =>
-        p.quantidadeEstoque <= 3 ? (
-          <Pill tone="pend">{p.quantidadeEstoque} un</Pill>
-        ) : (
-          <span className="tabular-nums text-ink-2">{p.quantidadeEstoque} un</span>
-        ),
-    },
+    ...(controlaEstoque
+      ? [
+          {
+            header: 'Estoque',
+            align: 'right',
+            cell: (p: Produto) =>
+              p.quantidadeEstoque <= 3 ? (
+                <Pill tone="pend">{p.quantidadeEstoque} un</Pill>
+              ) : (
+                <span className="tabular-nums text-ink-2">{p.quantidadeEstoque} un</span>
+              ),
+          } satisfies Column<Produto>,
+        ]
+      : []),
     {
       header: 'Ações',
       align: 'right',
@@ -143,6 +150,7 @@ export function ProdutosPage() {
           submitting={create.isPending || update.isPending}
           serverError={serverError}
           onCancel={() => setDrawerOpen(false)}
+          controlaEstoque={controlaEstoque}
         />
       </Drawer>
 

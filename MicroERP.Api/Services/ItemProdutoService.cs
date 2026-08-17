@@ -12,17 +12,28 @@ public sealed class ItemProdutoService : IItemProdutoService
     private readonly IAtendimentoRepository _atendimentoRepository;
     private readonly IProdutoRepository _produtoRepository;
     private readonly IItemServicoRepository _itemServicoRepository;
+    private readonly IConfiguracaoRepository _configuracaoRepository;
 
     public ItemProdutoService(
         IItemProdutoRepository itemProdutoRepository,
         IAtendimentoRepository atendimentoRepository,
         IProdutoRepository produtoRepository,
-        IItemServicoRepository itemServicoRepository)
+        IItemServicoRepository itemServicoRepository,
+        IConfiguracaoRepository configuracaoRepository)
     {
         _itemProdutoRepository = itemProdutoRepository;
         _atendimentoRepository = atendimentoRepository;
         _produtoRepository = produtoRepository;
         _itemServicoRepository = itemServicoRepository;
+        _configuracaoRepository = configuracaoRepository;
+    }
+
+    // Se a empresa controla estoque (default seguro: sim). Quando false, itens
+    // de catalogo nao baixam/devolvem estoque nem validam saldo (DEC-parametrizacao).
+    private async Task<bool> ControlaEstoqueAsync(long empresaId, CancellationToken cancellationToken)
+    {
+        var config = await _configuracaoRepository.GetByEmpresaAsync(empresaId, false, cancellationToken);
+        return config?.ControlaEstoque ?? true;
     }
 
     public async Task<IReadOnlyList<ItemProdutoResponse>> GetAllByAtendimentoAsync(long empresaId, long atendimentoId, CancellationToken cancellationToken)
@@ -52,13 +63,16 @@ public sealed class ItemProdutoService : IItemProdutoService
             var produto = await _produtoRepository.GetByIdAsync(empresaId, request.ProdutoId.Value, true, cancellationToken);
             if (produto is null) throw new NotFoundException("Produto nao encontrado.");
 
-            if (produto.QuantidadeEstoque < request.Quantidade)
+            if (await ControlaEstoqueAsync(empresaId, cancellationToken))
             {
-                throw new EstoqueInsuficienteException(produto.Nome);
-            }
+                if (produto.QuantidadeEstoque < request.Quantidade)
+                {
+                    throw new EstoqueInsuficienteException(produto.Nome);
+                }
 
-            produto.QuantidadeEstoque -= request.Quantidade;
-            produto.UpdatedAt = DateTime.UtcNow;
+                produto.QuantidadeEstoque -= request.Quantidade;
+                produto.UpdatedAt = DateTime.UtcNow;
+            }
 
             precoUnitario = request.PrecoUnitario ?? produto.Preco;
             descricao = string.IsNullOrWhiteSpace(request.Descricao) ? produto.Nome : request.Descricao;
@@ -100,8 +114,8 @@ public sealed class ItemProdutoService : IItemProdutoService
         var item = await _itemProdutoRepository.GetByIdAsync(empresaId, id, true, cancellationToken);
         if (item is null) throw new NotFoundException("Item de produto nao encontrado.");
 
-        // Ajuste de estoque apenas para itens de catalogo (com ProdutoId).
-        if (item.ProdutoId.HasValue)
+        // Ajuste de estoque apenas para itens de catalogo (com ProdutoId) quando a empresa controla estoque.
+        if (item.ProdutoId.HasValue && await ControlaEstoqueAsync(empresaId, cancellationToken))
         {
             var produto = await _produtoRepository.GetByIdAsync(empresaId, item.ProdutoId.Value, true, cancellationToken);
             if (produto is null) throw new NotFoundException("Produto nao encontrado.");
@@ -142,8 +156,9 @@ public sealed class ItemProdutoService : IItemProdutoService
         var item = await _itemProdutoRepository.GetByIdAsync(empresaId, id, true, cancellationToken);
         if (item is null) throw new NotFoundException("Item de produto nao encontrado.");
 
-        // Devolve estoque apenas para itens de catalogo (avulso nao movimentou estoque).
-        if (item.ProdutoId.HasValue)
+        // Devolve estoque apenas para itens de catalogo (avulso nao movimentou
+        // estoque) e apenas quando a empresa controla estoque.
+        if (item.ProdutoId.HasValue && await ControlaEstoqueAsync(empresaId, cancellationToken))
         {
             var produto = await _produtoRepository.GetByIdAsync(empresaId, item.ProdutoId.Value, true, cancellationToken);
             if (produto is not null)
