@@ -1,6 +1,7 @@
 import { api } from '@/lib/api'
 import { db } from '@/db/instance'
 import { saveConfig } from '@/lib/appConfig'
+import { saveSugeridos } from '@/lib/sugeridos'
 import type { LocalDb } from '@/db/types'
 import type {
   AgendaItem,
@@ -35,6 +36,7 @@ export async function carga(database: LocalDb = db): Promise<CargaResult> {
   if (data.configuracao) {
     await saveConfig(database, data.configuracao)
   }
+  await saveSugeridos(database, data.sugeridos ?? [])
   await database.setMeta('lastSync', data.sincronizadoEm)
 
   return {

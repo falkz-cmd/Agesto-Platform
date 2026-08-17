@@ -29,6 +29,13 @@ export interface Configuracao {
   controlaEstoque: boolean
 }
 
+/** Material sugerido de um serviço (kit), achatado — vem na Carga. */
+export interface ServicoSugerido {
+  servicoId: number
+  produtoId: number
+  quantidadePadrao: number
+}
+
 export interface Cliente {
   id: number
   uuid: string
@@ -90,6 +97,7 @@ export interface SyncCargaResponse {
   clientes: Cliente[]
   produtos: Produto[]
   servicos: Servico[]
+  sugeridos?: ServicoSugerido[]
   configuracao?: Configuracao | null
   sincronizadoEm: string
 }

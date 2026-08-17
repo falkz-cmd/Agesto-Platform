@@ -244,6 +244,19 @@ export type ConfiguracaoPatch = Partial<
   Pick<Configuracao, 'tipoOperacao' | 'modoAgendaAgente' | 'controlaEstoque'>
 >
 
+/** Material sugerido (kit) de um serviço. */
+export interface ServicoSugerido {
+  produtoId: number
+  produtoNome: string
+  quantidadePadrao: number
+}
+
+/** Item enviado no PUT do kit de um serviço. */
+export interface ServicoSugeridoInput {
+  produtoId: number
+  quantidadePadrao: number
+}
+
 /* ---------- Atendimento (execução) ---------- */
 
 export interface Atendimento {

@@ -20,6 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<ItemServico> ItemServicos => Set<ItemServico>();
     public DbSet<Orcamento> Orcamentos => Set<Orcamento>();
     public DbSet<ItemOrcamento> ItemOrcamentos => Set<ItemOrcamento>();
+    public DbSet<ServicoItemSugerido> ServicoItemSugeridos => Set<ServicoItemSugerido>();
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -207,6 +208,21 @@ public class AppDbContext : DbContext
                 .WithMany(o => o.Itens)
                 .HasForeignKey(e => e.OrcamentoId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ServicoItemSugerido>(entity =>
+        {
+            entity.HasIndex(e => e.EmpresaId);
+            // Um produto sugerido no maximo uma vez por servico.
+            entity.HasIndex(e => new { e.ServicoId, e.ProdutoId }).IsUnique();
+            entity.HasOne(e => e.Servico)
+                .WithMany()
+                .HasForeignKey(e => e.ServicoId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Produto)
+                .WithMany()
+                .HasForeignKey(e => e.ProdutoId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

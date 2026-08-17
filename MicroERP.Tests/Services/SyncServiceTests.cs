@@ -84,6 +84,22 @@ public sealed class SyncServiceTests
     }
 
     [Fact]
+    public async Task CargaAsync_IncluiMateriaisSugeridosDosServicos()
+    {
+        await using var db = CreateContext();
+        db.ServicoItemSugeridos.Add(new ServicoItemSugerido { Id = 1, EmpresaId = 1, ServicoId = 5, ProdutoId = 10, QuantidadePadrao = 2 });
+        db.ServicoItemSugeridos.Add(new ServicoItemSugerido { Id = 2, EmpresaId = 2, ServicoId = 9, ProdutoId = 99, QuantidadePadrao = 1 }); // outra empresa
+        await db.SaveChangesAsync();
+
+        var carga = await BuildSync(db).CargaAsync(1, null, CancellationToken.None);
+
+        Assert.Single(carga.Sugeridos);
+        Assert.Equal(5, carga.Sugeridos[0].ServicoId);
+        Assert.Equal(10, carga.Sugeridos[0].ProdutoId);
+        Assert.Equal(2, carga.Sugeridos[0].QuantidadePadrao);
+    }
+
+    [Fact]
     public async Task DescargaAsync_ModoFixa_IgnoraDataAgendada()
     {
         await using var db = CreateContext();
