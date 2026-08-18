@@ -1,0 +1,96 @@
+# Agesto — Visão Geral do Projeto
+
+> Antes chamado "Micro-ERP Auto" (renomeado em 04/08/2026, ver DEC-24 em `DECISIONS.md`).
+
+## O que é
+
+Sistema integrado **Web + Mobile** de gestão para microempreendedores e prestadores de serviço autônomos. Funciona como um ERP simplificado no Web e um aplicativo de força de vendas/serviços no Mobile.
+
+## Para quem é
+
+| Perfil | Exemplo | Como usa |
+|--------|---------|----------|
+| Pequeno comerciante | Vendedor de doces, loja informal | Registra vendas em campo, controla estoque |
+| Prestador de serviço | Técnico de AC, instalador | Registra atendimentos e serviços prestados |
+| Autônomo com equipe | Técnico com agentes em campo | Gerencia equipe, vê dashboard consolidado |
+
+## Qual problema resolve
+
+A maioria dos ERPs do mercado é voltada para médias e grandes empresas — complexos e caros. Microempreendedores ficam sem solução adequada e gerenciam o negócio em planilhas ou no papel.
+
+O Agesto oferece:
+- Interface simples, pensada para uso em campo
+- Funcionamento **offline-first** no Mobile (sem internet)
+- Sincronização manual implementada; automação quando a conexão voltar está planejada
+- Suporte a venda de produtos, prestação de serviços ou ambos (modo híbrido)
+
+## Estrutura do sistema
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Módulo Web (ERP/Gestão) — Módulo Dono                  │
+│  React + TypeScript                                      │
+│  → Dashboard, relatórios, cadastros, configurações      │
+└─────────────────────────────────────────────────────────┘
+                          ↕ API REST (JWT)
+┌─────────────────────────────────────────────────────────┐
+│  Backend Principal                                       │
+│  ASP.NET Core .NET 8 (C#) + Entity Framework Core      │
+│  PostgreSQL — provedor da nova infraestrutura a definir  │
+│  IA nativa no backend C# — planejada (DEC-21)            │
+└─────────────────────────────────────────────────────────┘
+                          ↕ API REST (JWT)
+┌─────────────────────────────────────────────────────────┐
+│  Módulo Mobile (App do Agente de Campo) — completo       │
+│  React Native (Expo) + expo-sqlite local (offline-first) │
+│  → Atendimentos, clientes, agenda, sincronização         │
+└─────────────────────────────────────────────────────────┘
+```
+
+> A IA roda **dentro do backend C#** (SDK oficial da Anthropic), não como serviço Python/FastAPI separado — decisão revisada na DEC-21. O design original com um módulo Python isolado está obsoleto (ver `DECISIONS.md`/`TASKS.md`).
+
+## Stack definida
+
+| Camada | Tecnologia |
+|--------|-----------|
+| Frontend Web (Módulo Dono) | Vite + React 19 + TypeScript, Tailwind v4, TanStack Query, MSW (mock), Recharts |
+| Backend Core | C# — ASP.NET Core .NET 8 + Entity Framework Core |
+| Banco de Dados | PostgreSQL; provedor da nova infraestrutura ainda será definido |
+| Mobile (App do Agente) | React Native + TypeScript (Expo/prebuild), Expo Router, `expo-sqlite` offline-first |
+| Módulo IA | Embutido no backend C#, via SDK oficial Anthropic Claude (DEC-21) — não há mais serviço Python separado |
+| Autenticação | JWT (HMAC-SHA256, 120min, claims: sub, email, jti, empresaId, perfil) |
+| Nuvem | A definir na fase de infraestrutura |
+| Testes | Backend: xUnit + Moq + EF Core InMemory/SQLite (90 testes). Web: Vitest + Testing Library (21 testes). Mobile: Jest/jest-expo (29 testes) |
+| Versionamento | Git + Gitflow |
+
+## Time
+
+| Membro | Papel | Responsabilidade principal |
+|--------|-------|---------------------------|
+| Davi Gomes Rocha | Tech Lead / responsável atual pelo produto | Visão geral, backend C#, frontend web e mobile, revisão de PRs |
+| Diego Mendes Santos | Dev Sênior (legado, time acadêmico original) | Infraestrutura, Azure, DevOps, backend C# |
+| Luan Gonzaga Oliveira | Dev (legado) | Backend C#, entidades, regras de negócio |
+| Davi de Oliveira Bueno | Dev (legado) | Módulo Python (FastAPI) + IA/Insights — obsoleto, ver DEC-21 |
+| Richard Batista | Dev part-time (legado) | Documentação, diagramas, QA |
+
+> Em 18/08/2026, o projeto iniciou a transição de volta para desenvolvimento em equipe, sob liderança de Davi Gomes. A composição atual, papéis e acessos ainda serão formalizados. A tabela acima permanece como histórico das contribuições acadêmicas e não representa automaticamente a equipe atual.
+
+## Status atual
+
+- **Fase:** MVP em evolução — transição para desenvolvimento em equipe e preparação da infraestrutura
+- **Branch principal:** `main` (repositório `Agesto-Platform`)
+- **Repositório:** `Agesto-Platform` — repo próprio, **público** (portfólio + comercial, licença restritiva; ver DEC-24). O acadêmico original `github.com/Auto-academic-erp/micro-erp-auto` fica como legado abandonado.
+- **Banco:** infraestrutura anterior descartada; novo PostgreSQL ainda será provisionado. As migrations existentes serão aplicadas somente depois da definição do ambiente
+- **Testes:** backend 90, web 21 e mobile 29 testes passando no último marco validado
+- **Frontend Web (Módulo Dono):** essencialmente completo — 14 tasks (web-01 a web-14) integradas na `main`, **sidebar 100% funcional**, cobrindo dashboard, autenticação, Cadastros (Clientes/Produtos/Serviços), Operação (Agenda/Orçamentos/Atendimentos) e Análise (Relatórios/Parametrização), consumindo o contrato real da API via mock stateful (MSW) enquanto o banco novo não sobe. Testes base (Vitest) cobrindo masks, período, store, Money e ClienteForm. Ver DEC-25 em `DECISIONS.md` e seção 10 do `DESIGN.md`.
+- **Mobile (App do Agente):** MVP offline-first e action-first em `mobile/`: login JWT, Carga, agenda, registro/agendamento de atendimento, cadastro rápido de cliente, materiais sugeridos, Descarga e status de sincronização. Último marco com 29 testes Jest, typecheck e lint verdes. A integração com a API real aguarda a infraestrutura e ainda existem deltas de sincronização documentados.
+- **Parametrização (DEC-27):** dois parâmetros por Empresa na `Configuracao`, ponta a ponta (backend + Carga + web + mobile) — `ModoAgendaAgente` (`Flexivel`/`Fixa`: se o agente pode agendar em campo) e `ControlaEstoque` (liga/desliga baixa e validação de estoque, para o prestador pass-through). Editáveis pelo Dono em Parametrização (web); propagados ao mobile pela Carga. 8 tasks (param-01 a param-08) integradas na `main`, revisadas (backend + frontend, aprovados). Testes: backend 83, mobile 25, web 17 — verdes. Agenda passou a incluir a `Configuracao`; contrato offline ganhou `DataAgendada`; `Fixa` com enforcement de servidor na Descarga.
+- **Kit de materiais sugeridos (DEC-28):** materiais sugeridos por Serviço (`ServicoItemSugerido`), ponta a ponta. Dono monta o kit na tela de Serviço; sugestão em 1 clique no Orçamento e Atendimento (web) e chip em 1 toque no registrar (mobile, offline via Carga); atalho "salvar materiais como sugeridos" a partir de um atendimento. 6 tasks (kit-01 a kit-06) na `main`. Testes: backend 90, mobile 29, web 17 — verdes.
+
+## Diferencial
+
+- Foco exclusivo em **microempreendedores e autônomos**
+- **Offline-first** — funciona sem internet no campo (implementado no Mobile, ver DEC-26)
+- Suporte a **múltiplos modos**: Venda, Serviço ou Híbrido (foco atual no Prestador de Serviço — DEC-15)
+- **Multi-agente** — dono gerencia equipe de agentes em campo
+- **IA nativa** para insights de negócio (planejada, embutida no backend C#, DEC-21) — ainda não implementada

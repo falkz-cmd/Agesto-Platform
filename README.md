@@ -7,7 +7,9 @@
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![EF Core](https://img.shields.io/badge/EF%20Core-8.0-512BD4)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Npgsql-336791)
-![Tests](https://img.shields.io/badge/tests-74%20passing-2EA043)
+![Backend tests](https://img.shields.io/badge/backend%20tests-90%20passing-2EA043)
+![Web tests](https://img.shields.io/badge/web%20tests-21%20passing-2EA043)
+![Mobile tests](https://img.shields.io/badge/mobile%20tests-29%20passing-2EA043)
 ![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial-orange)
 
 ---
@@ -49,21 +51,30 @@ Controller  →  Service (interface)  →  Repository (interface)  →  AppDbCon
 |--------|-----------|
 | Backend | C# ASP.NET Core .NET 8 + Entity Framework Core 8 |
 | Banco | PostgreSQL (Npgsql) |
-| IA | SDK oficial da Anthropic, nativo no backend C# |
-| Web (dono) | React + TypeScript *(a iniciar)* |
-| Mobile (agente de campo) | React Native, offline-first *(a iniciar)* |
-| Auth | JWT multi-tenant (claims `empresa`, `sub`, `perfil`) |
+| IA | Integração nativa planejada no backend C#; ainda não implementada |
+| Web (dono) | React 19 + TypeScript + Vite + Tailwind + TanStack Query |
+| Mobile (agente de campo) | React Native + Expo + SQLite, offline-first |
+| Auth | JWT multi-tenant (claims `empresaId`, `sub`, `perfil`) |
 | Testes | xUnit + Moq + EF Core InMemory/Sqlite |
 
 ## Status
 
 | Área | Estado |
 |------|--------|
-| Backend (domínio do prestador) | 🟢 Essencialmente completo — **74 testes passando** |
+| Backend (domínio do prestador) | 🟡 MVP avançado — **90 testes passando**; migrations aguardam banco novo |
 | Camada de métricas + rentabilidade | 🟢 Implementada |
 | Orçamento / Agendamento / Margem | 🟢 Implementados |
-| IA nativa (insights) | 🟡 Em desenvolvimento |
-| Frontend Web + Mobile | ⚪ A iniciar (protótipos aprovados) |
+| IA nativa (insights) | ⚪ Planejada |
+| Frontend Web | 🟡 MVP funcional com mocks — **21 testes** |
+| Mobile | 🟡 MVP offline-first funcional — **29 testes** |
+
+## Documentação e contribuição
+
+- [Visão e documentação de produto](docs/project/README.md)
+- [Como contribuir](CONTRIBUTING.md)
+- [Regras para agentes e automações](AGENTS.md)
+
+O fluxo da equipe é `feature/* → develop → main`. Alterações entram por pull request e `main` recebe apenas marcos revisados com as verificações relevantes verdes.
 
 ## Rodando o backend
 
@@ -95,6 +106,4 @@ dotnet test MicroERP.sln
 
 ## Origem
 
-O projeto começou como um trabalho acadêmico em grupo (MIT). O backend foi
-reescrito e passou a ser mantido individualmente por **Davi Gomes Rocha**, que
-segue o desenvolvimento como produto próprio sob a licença acima.
+O projeto começou como um trabalho acadêmico e evoluiu para um produto em desenvolvimento por equipe, liderado por **Davi Gomes Rocha**. A composição atual e as responsabilidades serão publicadas depois da definição formal de acessos e papéis.

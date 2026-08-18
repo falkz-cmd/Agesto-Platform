@@ -10,7 +10,7 @@ updates:
       timezone: "America/Sao_Paulo"
     open-pull-requests-limit: 5
     reviewers:
-      - "Auto-academic-erp/core-devs"
+      - "falkz-cmd"
     commit-message:
       prefix: "chore(deps)"
     labels:
@@ -23,7 +23,65 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
-  # GitHub Actions (quando configurarmos CI/CD da KAN-16)
+  - package-ecosystem: "nuget"
+    directory: "/MicroERP.Tests"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "falkz-cmd"
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "backend"
+      - "tests"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "npm"
+    directory: "/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:15"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "falkz-cmd"
+    commit-message:
+      prefix: "chore(deps-web)"
+    labels:
+      - "dependencies"
+      - "web"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "npm"
+    directory: "/mobile"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:30"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "falkz-cmd"
+    commit-message:
+      prefix: "chore(deps-mobile)"
+    labels:
+      - "dependencies"
+      - "mobile"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions usadas pelo CI
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

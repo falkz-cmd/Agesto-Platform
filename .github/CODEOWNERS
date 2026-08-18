@@ -1,0 +1,10 @@
+# Responsável temporário enquanto a organização e as equipes não foram criadas.
+* @falkz-cmd
+
+# Regras sensíveis
+/MicroERP.Api/Migrations/ @falkz-cmd
+/MicroERP.Api/Controllers/ @falkz-cmd
+/MicroERP.Api/Services/ @falkz-cmd
+/mobile/src/sync/ @falkz-cmd
+/.github/ @falkz-cmd
+/docs/project/ @falkz-cmd
