@@ -1,0 +1,48 @@
+name: Funcionalidade
+description: Proponha uma capacidade ou melhoria de produto
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema do usuário
+      description: Quem possui o problema e em qual situação ele aparece?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Resultado esperado
+      description: Descreva o resultado, sem impor uma implementação técnica.
+    validations:
+      required: true
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Público principal
+      options: [Dono no Web, Agente no Mobile, Ambos, Operação interna]
+    validations:
+      required: true
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impactos prováveis
+      options:
+        - label: Backend/API
+        - label: Banco/migration
+        - label: Web
+        - label: Mobile/offline
+        - label: Sincronização
+        - label: Relatórios/IA
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceite
+      description: Liste comportamentos observáveis que indicam que a entrega está pronta.
+    validations:
+      required: true
+  - type: textarea
+    id: decisions
+    attributes:
+      label: Decisões ou dúvidas em aberto
