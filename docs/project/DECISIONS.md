@@ -399,7 +399,9 @@ Um produto de catálogo pode viver nos dois contextos. A venda avulsa de produto
 
 **Status:** ✅ Resolvido — 04/08/2026 (decisão do dono, dev solo)
 
-**Decisão:** O produto passa a se chamar **Agesto** (antes "Micro-ERP Auto"). O código passa a viver em um **repositório novo, próprio e público**: `Agesto-Platform`, sob a conta do Davi — separado do repositório acadêmico original (`Auto-academic-erp/micro-erp-auto`), que foi criado por outro integrante do grupo e é abandonado como legado.
+**Decisão:** O produto passa a se chamar **Agesto** (antes "Micro-ERP Auto"). O código passa a viver em um **repositório novo, próprio e público**, separado do repositório acadêmico original (`Auto-academic-erp/micro-erp-auto`), que foi criado por outro integrante do grupo e é abandonado como legado.
+
+**Atualização de governança — 19/08/2026:** o repositório foi transferido para a organização e renomeado para [`Agesto-Platform/Agesto`](https://github.com/Agesto-Platform/Agesto), preservando histórico, branches, pull requests e CI.
 
 **Origem do nome:** marca coined a partir de raízes latinas — *agere* (agir, operar) + *gestio* (gerir, gestão) → **Agesto**. Escolhido por soar sério/internacional (evitando nomes em português, percebidos como informais) e por ser "ownable" (sem significado prévio, facilitando registro de marca). "Auto" foi descartado por ser genérico e provavelmente não registrável.
 
@@ -419,7 +421,7 @@ Um produto de catálogo pode viver nos dois contextos. A venda avulsa de produto
 
 **Status:** ✅ Resolvido — implementado (web-01 a web-12, integrado na `main` em 04/08/2026)
 
-**Decisão:** O frontend web do Dono (`web/` no monorepo `Agesto-Platform`) usa **Vite + React 19 + TypeScript**, **Tailwind CSS v4** (config CSS-first via `@theme`, tokens portados do protótipo aprovado `web-dono.html`), **React Router**, **TanStack Query** para dados de servidor, **MSW** (Mock Service Worker) como camada de mock stateful enquanto não há banco/API real no ar, e **Recharts** para gráficos. Lint via oxlint.
+**Decisão:** O frontend web do Dono (`web/` no monorepo `Agesto-Platform/Agesto`) usa **Vite + React 19 + TypeScript**, **Tailwind CSS v4** (config CSS-first via `@theme`, tokens portados do protótipo aprovado `web-dono.html`), **React Router**, **TanStack Query** para dados de servidor, **MSW** (Mock Service Worker) como camada de mock stateful enquanto não há banco/API real no ar, e **Recharts** para gráficos. Lint via oxlint.
 
 **Contexto:** O front precisava ser construído antes do banco Supabase novo estar pronto (ver `project_banco_supabase`). Para não travar no schema real, o time optou por consumir o contrato real da API (DTOs espelhados em `types/api.ts`) contra um mock stateful (MSW), permitindo alternar para a API real trocando só uma env var.
 
@@ -449,7 +451,7 @@ Um produto de catálogo pode viver nos dois contextos. A venda avulsa de produto
 
 **Status:** ✅ Resolvido — implementado (mob-01 a mob-07, integrado na `main` em 11/08/2026)
 
-**Decisão:** O app mobile do agente de campo (`mobile/` no monorepo `Agesto-Platform`) usa **React Native + TypeScript via Expo (prebuild)**, com **Expo Router** para navegação, tokens de design portados do protótipo aprovado (azul `#243FA6` + verde `#12B886`, tema claro), e uma tab bar (Início/Agenda/Atendimentos/Clientes/Mais). Estilização via **theme + StyleSheet** — não NativeWind. Persistência offline via **`expo-sqlite`** no device, atrás de uma interface própria (`LocalDb`), com adapter em memória para Web/testes. Cliente de API com envelope padrão + tratamento de 401, e uma **camada de mock em código** (`config.useMocks`), análoga ao `VITE_USE_MOCKS` do web (DEC-25). Login JWT com token guardado via `expo-secure-store` (device) ou `localStorage` (web), split por plataforma.
+**Decisão:** O app mobile do agente de campo (`mobile/` no monorepo `Agesto-Platform/Agesto`) usa **React Native + TypeScript via Expo (prebuild)**, com **Expo Router** para navegação, tokens de design portados do protótipo aprovado (azul `#243FA6` + verde `#12B886`, tema claro), e uma tab bar (Início/Agenda/Atendimentos/Clientes/Mais). Estilização via **theme + StyleSheet** — não NativeWind. Persistência offline via **`expo-sqlite`** no device, atrás de uma interface própria (`LocalDb`), com adapter em memória para Web/testes. Cliente de API com envelope padrão + tratamento de 401, e uma **camada de mock em código** (`config.useMocks`), análoga ao `VITE_USE_MOCKS` do web (DEC-25). Login JWT com token guardado via `expo-secure-store` (device) ou `localStorage` (web), split por plataforma.
 
 **Contexto:** Assim como o front web (DEC-25), o mobile precisou ser construído antes do banco Supabase novo estar pronto e antes de o backend do domínio Prestador de Serviço (KAN-69) estar mergeado/aplicado. A camada de mock em código replica a mesma filosofia do MSW do web — consumir o contrato real da API, mockado, com troca por uma flag.
 
@@ -539,9 +541,9 @@ Motivo: permite verificar o app ponta a ponta no Expo Web e rodar testes Jest se
 
 ## DEC-29 — Retomada do desenvolvimento em equipe e propriedade organizacional
 
-**Status:** Decidido — 18/08/2026
+**Status:** 🟡 Em implementação — organização, transferência e equipe concluídas em 19/08/2026; rulesets e formalização jurídica ainda pendentes
 
-**Decisão:** O Agesto deixa de operar como projeto mantido por uma única pessoa e volta ao desenvolvimento em equipe. Davi continua como líder e responsável final pelas decisões de produto até que a governança seja formalizada. O repositório será transferido de uma conta pessoal para uma organização GitHub, preservando histórico, branches e contribuições.
+**Decisão:** O Agesto deixa de operar como projeto mantido por uma única pessoa e volta ao desenvolvimento em equipe. Davi continua responsável pelas decisões de produto. O repositório foi transferido para a organização `Agesto-Platform`, preservando histórico, branches e contribuições.
 
 **Motivo:** embora o MVP tenha avançado sob desenvolvimento individual, a continuidade comercial exige revisão humana, divisão de responsabilidades, continuidade de acesso e capacidade de evolução paralela.
 
@@ -551,6 +553,8 @@ Motivo: permite verificar o app ponta a ponta no Expo Web e rodar testes Jest se
 - `develop` e `main` protegidas por revisão e verificações automatizadas;
 - permissões concedidas por função e com privilégio mínimo;
 - documentação oficial versionada em `docs/project/`;
-- papéis, propriedade intelectual e responsabilidade por módulos ainda precisam ser formalizados.
+- equipe fundadora registrada como Davi Gomes Rocha (Founder e Product Owner), Depowo (Cofounder, foco inicial em infraestrutura) e ghzpro034 (Cofounder, atuação generalista);
+- Davi e Depowo como Owners da organização; ghzpro034 como Member com acesso Write pelo time visível `Core`;
+- propriedade intelectual e responsabilidades definitivas por módulo ainda precisam ser formalizadas.
 
 **Impacto em decisões anteriores:** menções a “dev solo” permanecem como contexto histórico da decisão original e não representam a composição atual. A escolha de React Native, C# e monorepo não muda automaticamente com a retomada da equipe; qualquer revisão será uma nova decisão explícita.

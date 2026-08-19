@@ -65,21 +65,19 @@ O Agesto oferece:
 
 ## Time
 
-| Membro | Papel | Responsabilidade principal |
-|--------|-------|---------------------------|
-| Davi Gomes Rocha | Tech Lead / responsável atual pelo produto | Visão geral, backend C#, frontend web e mobile, revisão de PRs |
-| Diego Mendes Santos | Dev Sênior (legado, time acadêmico original) | Infraestrutura, Azure, DevOps, backend C# |
-| Luan Gonzaga Oliveira | Dev (legado) | Backend C#, entidades, regras de negócio |
-| Davi de Oliveira Bueno | Dev (legado) | Módulo Python (FastAPI) + IA/Insights — obsoleto, ver DEC-21 |
-| Richard Batista | Dev part-time (legado) | Documentação, diagramas, QA |
+| Membro | Papel | Responsabilidade principal | GitHub |
+|--------|-------|---------------------------|--------|
+| Davi Gomes Rocha | Founder e Product Owner | Produto, prioridades, arquitetura e coordenação técnica | `falkz-cmd` — Owner |
+| Depowo | Cofounder | Infraestrutura, DevOps e continuidade operacional | `Depowo` — Owner |
+| ghzpro034 | Cofounder | Desenvolvimento generalista em backend, web e mobile | `ghzpro034` — Member/Write |
 
-> Em 18/08/2026, o projeto iniciou a transição de volta para desenvolvimento em equipe, sob liderança de Davi Gomes. A composição atual, papéis e acessos ainda serão formalizados. A tabela acima permanece como histórico das contribuições acadêmicas e não representa automaticamente a equipe atual.
+Os três integram o time visível `@Agesto-Platform/core`. Os papéis indicam o foco inicial, sem impedir contribuições cruzadas. As contribuições do time acadêmico original permanecem preservadas no histórico Git, mas não representam a composição atual.
 
 ## Status atual
 
 - **Fase:** MVP em evolução — transição para desenvolvimento em equipe e preparação da infraestrutura
-- **Branch principal:** `main` (repositório `Agesto-Platform`)
-- **Repositório:** `Agesto-Platform` — repo próprio, **público** (portfólio + comercial, licença restritiva; ver DEC-24). O acadêmico original `github.com/Auto-academic-erp/micro-erp-auto` fica como legado abandonado.
+- **Branch principal:** `main` (repositório `Agesto-Platform/Agesto`)
+- **Repositório:** [`Agesto-Platform/Agesto`](https://github.com/Agesto-Platform/Agesto) — repo próprio, **público** (portfólio + comercial, licença restritiva; ver DEC-24). O acadêmico original `github.com/Auto-academic-erp/micro-erp-auto` fica como legado abandonado.
 - **Banco:** infraestrutura anterior descartada; novo PostgreSQL ainda será provisionado. As migrations existentes serão aplicadas somente depois da definição do ambiente
 - **Testes:** backend 90, web 21 e mobile 29 testes passando no último marco validado
 - **Frontend Web (Módulo Dono):** essencialmente completo — 14 tasks (web-01 a web-14) integradas na `main`, **sidebar 100% funcional**, cobrindo dashboard, autenticação, Cadastros (Clientes/Produtos/Serviços), Operação (Agenda/Orçamentos/Atendimentos) e Análise (Relatórios/Parametrização), consumindo o contrato real da API via mock stateful (MSW) enquanto o banco novo não sobe. Testes base (Vitest) cobrindo masks, período, store, Money e ClienteForm. Ver DEC-25 em `DECISIONS.md` e seção 10 do `DESIGN.md`.

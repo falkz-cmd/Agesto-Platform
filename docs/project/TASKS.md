@@ -8,14 +8,14 @@
 
 | Item | Estado |
 |---|---|
-| Centralizar documentação em `docs/project/` | 🟡 Em andamento |
-| Definir integrantes, papéis e responsáveis por módulo | 🔴 Pendente |
-| Criar organização GitHub e transferir `Agesto-Platform` | 🔴 Pendente |
-| Configurar equipes, acessos mínimos e segundo Owner | 🔴 Pendente |
+| Centralizar documentação em `docs/project/` | 🟢 Concluído |
+| Definir integrantes, papéis e focos iniciais | 🟢 Concluído — Davi (Produto), Depowo (Infra), ghzpro034 (Generalista) |
+| Criar organização GitHub e transferir para `Agesto-Platform/Agesto` | 🟢 Concluído |
+| Configurar time `Core`, acessos mínimos e segundo Owner | 🟢 Concluído — Davi e Depowo são Owners |
 | Proteger `develop` e `main` com PR, revisão e status checks | 🔴 Pendente |
-| Adicionar CI para backend, web e mobile | 🔴 Pendente |
+| Adicionar CI para backend, web e mobile | 🟢 Concluído — validado na promoção de governança |
 | Auditar `REQUIREMENTS.md` reconstruído | 🟡 Em andamento |
-| Enviar os 24 commits locais ainda ausentes em `origin/main` | 🔴 Pendente — somente após revisão e autorização |
+| Publicar a linha local consolidada em `main` | 🟢 Concluído — merge `72b021b` |
 
 ---
 
@@ -123,6 +123,7 @@
 | KAN-12 | Repositório Git + Gitflow | Diego |
 | KAN-13 | Projeto ASP.NET Core .NET 8 | Davi Gomes |
 | KAN-35 | Testes de endpoints | Diego |
+| KAN-16 | CI para backend, web e mobile | Equipe Agesto |
 
 ### 🔴 Pendentes
 
@@ -130,11 +131,10 @@
 |-----|-----------|------------|-------------|
 | KAN-14 | PostgreSQL de desenvolvimento + migrations | Alta | A definir |
 | KAN-15 | Escolher provedor e ambientes | Alta | Equipe |
-| KAN-16 | CI para backend, web e mobile | Alta | Em andamento |
 | KAN-17 | Deploy inicial da API | Média | A definir |
 | KAN-18 | Documentar processo de deploy | Baixa | A definir |
 | KAN-54 | Agents de QA automatizados | Baixa | Diego |
-| — | Organização GitHub + rulesets em `develop` e `main` | Alta | Davi Gomes |
+| — | Configurar rulesets em `develop` e `main` | Alta | Davi Gomes |
 | — | Instalar dotnet ef global na máquina | Média | Davi Gomes |
 | — | Aplicar migrations pendentes no novo PostgreSQL | Alta | A definir |
 | — | Subir banco/API real e trocar `VITE_USE_MOCKS`/`config.useMocks` para `false` no Web e no Mobile | Alta | Davi Gomes |
@@ -211,7 +211,7 @@
 
 ## Frontend Web (React) — Módulo Dono
 
-**Stack:** Vite + React 19 + TypeScript · Tailwind v4 (tokens do protótipo) · React Router · TanStack Query · MSW (mock enquanto não há banco/API no ar) · Recharts. Vive em `web/` no monorepo (`Agesto-Platform`). Rodar: `cd web && npm install && npm run dev` (mock ligado via `.env`: `VITE_USE_MOCKS=true`). Login demo (mock): `dono@agesto.app` / `agesto123`. Decisões de stack e arquitetura registradas em DEC-25 (`DECISIONS.md`) e na seção 10 do `DESIGN.md`.
+**Stack:** Vite + React 19 + TypeScript · Tailwind v4 (tokens do protótipo) · React Router · TanStack Query · MSW (mock enquanto não há banco/API no ar) · Recharts. Vive em `web/` no monorepo (`Agesto-Platform/Agesto`). Rodar: `cd web && npm install && npm run dev` (mock ligado via `.env`: `VITE_USE_MOCKS=true`). Login demo (mock): `dono@agesto.app` / `agesto123`. Decisões de stack e arquitetura registradas em DEC-25 (`DECISIONS.md`) e na seção 10 do `DESIGN.md`.
 
 ### ✅ Concluídas — fatia inicial navegável (integrada na `main`)
 
@@ -257,7 +257,7 @@ Tracking local (Jira offline); numeração `web-0x` mapeada aos KANs existentes.
 
 ## Mobile (React Native) — App do Agente
 
-**Status:** 🟢 Completo (mob-01 a mob-07) — integrado direto na `main` do monorepo `Agesto-Platform`, em `mobile/`. Offline-first, action-first. Decisões de stack e arquitetura registradas em DEC-26 (`DECISIONS.md`) e na seção 11 do `DESIGN.md`.
+**Status:** 🟢 Completo (mob-01 a mob-07) — integrado direto na `main` do monorepo `Agesto-Platform/Agesto`, em `mobile/`. Offline-first, action-first. Decisões de stack e arquitetura registradas em DEC-26 (`DECISIONS.md`) e na seção 11 do `DESIGN.md`.
 
 **Stack:** React Native + TypeScript via Expo (prebuild) · Expo Router · tokens do protótipo (azul `#243FA6` + verde `#12B886`, tema claro) · tema + StyleSheet (não NativeWind) · `expo-sqlite` (device) / adapter em memória (Web/testes) atrás da interface `LocalDb` · cliente de API com camada de mock em código (`config.useMocks`) · JWT via `expo-secure-store`/`localStorage`. Login demo (mock): `agente@agesto.app` / `agesto123`.
 
@@ -299,20 +299,19 @@ Tracking local (Jira offline); numeração `mob-0x`.
 
 ## Ordem de execução recomendada (próximas sprints)
 
-> O MVP possui backend, Web e Mobile funcionais contra mocks, e os batches do domínio Prestador já estão integrados na linha local. Antes da infraestrutura, a prioridade passou a ser concluir a transição para equipe: documentação versionada, CI, revisão dos 24 commits não publicados, organização GitHub, permissões e rulesets. Depois disso, será provisionado um PostgreSQL novo, as migrations serão aplicadas em ambiente controlado e os clientes trocarão os mocks pela API real.
+> O MVP possui backend, Web e Mobile funcionais contra mocks e publicados em `Agesto-Platform/Agesto`. Organização, time `Core`, CI e linha principal já estão configurados. Antes da infraestrutura, restam os rulesets, a auditoria documental e a formalização das responsabilidades e da propriedade intelectual. Depois disso, será provisionado um PostgreSQL novo, as migrations serão aplicadas em ambiente controlado e os clientes trocarão os mocks pela API real.
 
 ### Sprint imediata
-1. Concluir a auditoria e centralização documental em `docs/project/`
-2. Validar CI, templates, CODEOWNERS e guia de contribuição
-3. Revisar e publicar os commits locais ainda ausentes no GitHub
-4. Criar a organização, transferir o repositório e configurar equipes/rulesets
-5. Definir integrantes, papéis, propriedade das contribuições e responsáveis por módulo
-6. **Provisionar PostgreSQL novo e aplicar migrations pendentes** em ambiente controlado
-7. Subir a API real e desligar os mocks no Web e no Mobile
-8. Depois da auditoria: remover documentação legada em tarefa separada
+1. Configurar rulesets em `develop` e `main` com PR, revisão e status checks
+2. Concluir a auditoria de `REQUIREMENTS.md`
+3. Formalizar propriedade das contribuições e responsabilidades definitivas por módulo
+4. Depois da auditoria, remover a documentação legada em tarefa separada
+5. **Provisionar PostgreSQL novo e aplicar migrations pendentes** em ambiente controlado
+6. Subir a API real e desligar os mocks no Web e no Mobile
+7. Executar testes integrados com Web, Mobile, API e PostgreSQL reais
 
 ### Sprint seguinte
-9. Débitos residuais: margem/hora do KAN-79 (após campo de duração), roteirização/lat-lng (DEC-17), descarga de Orçamento no sync, agenda na Carga do sync mobile, mapear uuid→id do cliente na Descarga mobile, paginação no `GetAllAsync`, lazy-load do Recharts e sincronização automática em background
+8. Débitos residuais: margem/hora do KAN-79 (após campo de duração), roteirização/lat-lng (DEC-17), descarga de Orçamento no sync, agenda na Carga do sync mobile, mapear uuid→id do cliente na Descarga mobile, paginação no `GetAllAsync`, lazy-load do Recharts e sincronização automática em background
 
 ---
 
