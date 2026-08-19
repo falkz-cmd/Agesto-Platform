@@ -81,8 +81,8 @@ O fluxo da equipe é `feature/* → develop → main`. Alterações entram por p
 > Pré-requisitos: .NET 8 SDK e um PostgreSQL acessível.
 
 ```bash
-git clone https://github.com/falkz-cmd/Agesto-Platform.git
-cd Agesto-Platform/MicroERP.Api
+git clone https://github.com/Agesto-Platform/Agesto.git
+cd Agesto/MicroERP.Api
 
 # configurar segredos locais (NÃO versionados)
 cp appsettings.Development.json.example appsettings.Development.json
@@ -106,4 +106,4 @@ dotnet test MicroERP.sln
 
 ## Origem
 
-O projeto começou como um trabalho acadêmico e evoluiu para um produto em desenvolvimento por equipe, liderado por **Davi Gomes Rocha**. A composição atual e as responsabilidades serão publicadas depois da definição formal de acessos e papéis.
+O projeto começou como um trabalho acadêmico e evoluiu para um produto em desenvolvimento pela equipe fundadora: **Davi Gomes Rocha** (Founder e Product Owner), **Depowo** (Cofounder, foco inicial em infraestrutura) e **ghzpro034** (Cofounder, atuação generalista). A governança técnica usa a organização [`Agesto-Platform`](https://github.com/Agesto-Platform) e o time `Core`.

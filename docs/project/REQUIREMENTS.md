@@ -141,7 +141,7 @@ A `Configuracao` tem mais dois parâmetros por Empresa, editáveis pelo Dono em 
 
 ## 7. Módulo Mobile — Requisitos Específicos
 
-> As subseções abaixo descrevem o comportamento hoje construído no app mobile (`mobile/`, tasks mob-01 a mob-07, na `main` do repo `Agesto-Platform`). Ver DEC-26 em `DECISIONS.md` e seção 11 do `DESIGN.md` para a stack e arquitetura.
+> As subseções abaixo descrevem o comportamento hoje construído no app mobile (`mobile/`, tasks mob-01 a mob-07, na `main` do repo `Agesto-Platform/Agesto`). Ver DEC-26 em `DECISIONS.md` e seção 11 do `DESIGN.md` para a stack e arquitetura.
 
 ### 7.1 Offline-First
 - **[Implementado]** O agente consegue registrar atendimentos e cadastrar clientes sem conexão com internet — dados salvos localmente (`expo-sqlite` no device; adapter em memória no Expo Web/testes) atrás da interface `LocalDb`

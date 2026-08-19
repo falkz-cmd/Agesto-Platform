@@ -1,10 +1,10 @@
-# Responsável temporário enquanto a organização e as equipes não foram criadas.
-* @falkz-cmd
+# Time principal da organização, responsável pela revisão do monorepo.
+* @Agesto-Platform/core
 
 # Regras sensíveis
-/MicroERP.Api/Migrations/ @falkz-cmd
-/MicroERP.Api/Controllers/ @falkz-cmd
-/MicroERP.Api/Services/ @falkz-cmd
-/mobile/src/sync/ @falkz-cmd
-/.github/ @falkz-cmd
-/docs/project/ @falkz-cmd
+/MicroERP.Api/Migrations/ @Agesto-Platform/core
+/MicroERP.Api/Controllers/ @Agesto-Platform/core
+/MicroERP.Api/Services/ @Agesto-Platform/core
+/mobile/src/sync/ @Agesto-Platform/core
+/.github/ @Agesto-Platform/core
+/docs/project/ @Agesto-Platform/core

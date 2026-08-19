@@ -361,7 +361,7 @@ GET /api/metrics/dashboard
 
 ## 10. Frontend Web (Módulo Dono)
 
-Front web do perfil Dono, em `web/` no monorepo `Agesto-Platform`. Consome a API C# via HTTPS+JWT (seção 1). Design original aprovado a partir do protótipo `web-dono.html` — web é a plataforma **analítica** (gráficos, margem, rankings), em contraste com o mobile, que é **action-first** para o agente em campo (ver identidade de design: azul `#2B4ACB` para marca/ação, verde `#0E9E63` para sucesso/margem/lucro, tema claro, serif Georgia opcional só nos números de dinheiro).
+Front web do perfil Dono, em `web/` no monorepo `Agesto-Platform/Agesto`. Consome a API C# via HTTPS+JWT (seção 1). Design original aprovado a partir do protótipo `web-dono.html` — web é a plataforma **analítica** (gráficos, margem, rankings), em contraste com o mobile, que é **action-first** para o agente em campo (ver identidade de design: azul `#2B4ACB` para marca/ação, verde `#0E9E63` para sucesso/margem/lucro, tema claro, serif Georgia opcional só nos números de dinheiro).
 
 ### Stack
 - **Vite + React 19 + TypeScript**
@@ -398,7 +398,7 @@ Ver DEC-25 em `DECISIONS.md` para o histórico completo da decisão, e TASKS.md 
 
 ## 11. Mobile (App do Agente)
 
-App mobile do agente de campo, em `mobile/` no monorepo `Agesto-Platform`. Consome a API C# via HTTPS+JWT (seção 1), com camada de persistência offline local. Design **action-first** — em contraste com o Web (seção 10), que é a plataforma analítica do dono — usando a mesma identidade visual base (azul `#243FA6`/`#2B4ACB`, verde `#12B886`/`#0E9E63`, tema claro). Ver DEC-26 em `DECISIONS.md` para o histórico completo da decisão.
+App mobile do agente de campo, em `mobile/` no monorepo `Agesto-Platform/Agesto`. Consome a API C# via HTTPS+JWT (seção 1), com camada de persistência offline local. Design **action-first** — em contraste com o Web (seção 10), que é a plataforma analítica do dono — usando a mesma identidade visual base (azul `#243FA6`/`#2B4ACB`, verde `#12B886`/`#0E9E63`, tema claro). Ver DEC-26 em `DECISIONS.md` para o histórico completo da decisão.
 
 ### Stack
 - **React Native + TypeScript**, via **Expo (prebuild)**
