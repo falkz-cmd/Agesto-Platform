@@ -78,6 +78,7 @@ Os três integram o time visível `@Agesto-Platform/core`. Os papéis indicam o 
 - **Fase:** MVP em evolução — transição para desenvolvimento em equipe e preparação da infraestrutura
 - **Branch principal:** `main` (repositório `Agesto-Platform/Agesto`)
 - **Repositório:** [`Agesto-Platform/Agesto`](https://github.com/Agesto-Platform/Agesto) — repo próprio, **público** (portfólio + comercial, licença restritiva; ver DEC-24). O acadêmico original `github.com/Auto-academic-erp/micro-erp-auto` fica como legado abandonado.
+- **Governança GitHub:** time `Core` como Code Owner; `main` e `develop` protegidas pelo ruleset ativo `Protected branches`, com PR, uma aprovação e CI obrigatório (`Backend`, `Web`, `Mobile`).
 - **Banco:** infraestrutura anterior descartada; novo PostgreSQL ainda será provisionado. As migrations existentes serão aplicadas somente depois da definição do ambiente
 - **Testes:** backend 90, web 21 e mobile 29 testes passando no último marco validado
 - **Frontend Web (Módulo Dono):** essencialmente completo — 14 tasks (web-01 a web-14) integradas na `main`, **sidebar 100% funcional**, cobrindo dashboard, autenticação, Cadastros (Clientes/Produtos/Serviços), Operação (Agenda/Orçamentos/Atendimentos) e Análise (Relatórios/Parametrização), consumindo o contrato real da API via mock stateful (MSW) enquanto o banco novo não sobe. Testes base (Vitest) cobrindo masks, período, store, Money e ClienteForm. Ver DEC-25 em `DECISIONS.md` e seção 10 do `DESIGN.md`.

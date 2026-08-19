@@ -179,13 +179,13 @@ public enum StatusAtendimento { Pendente, Concluido, Cancelado }
 
 ## DEC-12 — GitHub Education para branch protection
 
-**Status:** Pendente — ação do Tech Lead
+**Status:** ✅ Resolvido — 19/08/2026
 
-**Situação:** Branch protection rules requerem plano pago para repositórios privados. Atualmente commits diretos em `develop` são possíveis sem PR.
+**Situação original:** Branch protection rules exigiam plano pago no repositório privado acadêmico, permitindo commits diretos em `develop` sem PR.
 
 **Mitigação:** Acordo de processo — ninguém faz push direto em `develop` ou `main` sem aprovação de Davi Gomes ou Diego Mendes.
 
-**Ação planejada:** Tech Lead solicitar GitHub Education Pack com email acadêmico da Uniube.
+**Resolução:** o repositório público `Agesto-Platform/Agesto` possui o ruleset ativo `Protected branches`, aplicado a `main` e `develop`. Ele exige PR, uma aprovação, Code Owner, aprovação do último push, resolução das conversas, branch atualizada e checks `Backend`, `Web` e `Mobile`; também bloqueia exclusão e force push. O GitHub Education Pack deixou de ser necessário para essa proteção.
 
 ---
 
@@ -541,7 +541,7 @@ Motivo: permite verificar o app ponta a ponta no Expo Web e rodar testes Jest se
 
 ## DEC-29 — Retomada do desenvolvimento em equipe e propriedade organizacional
 
-**Status:** 🟡 Em implementação — organização, transferência e equipe concluídas em 19/08/2026; rulesets e formalização jurídica ainda pendentes
+**Status:** 🟡 Em implementação — governança técnica concluída em 19/08/2026; formalização jurídica ainda pendente
 
 **Decisão:** O Agesto deixa de operar como projeto mantido por uma única pessoa e volta ao desenvolvimento em equipe. Davi continua responsável pelas decisões de produto. O repositório foi transferido para a organização `Agesto-Platform`, preservando histórico, branches e contribuições.
 
@@ -555,6 +555,7 @@ Motivo: permite verificar o app ponta a ponta no Expo Web e rodar testes Jest se
 - documentação oficial versionada em `docs/project/`;
 - equipe fundadora registrada como Davi Gomes Rocha (Founder e Product Owner), Depowo (Cofounder, foco inicial em infraestrutura) e ghzpro034 (Cofounder, atuação generalista);
 - Davi e Depowo como Owners da organização; ghzpro034 como Member com acesso Write pelo time visível `Core`;
+- ruleset `Protected branches` ativo em `main` e `develop`, sem bypass, exigindo uma aprovação de Code Owner e os checks `Backend`, `Web` e `Mobile`;
 - propriedade intelectual e responsabilidades definitivas por módulo ainda precisam ser formalizadas.
 
 **Impacto em decisões anteriores:** menções a “dev solo” permanecem como contexto histórico da decisão original e não representam a composição atual. A escolha de React Native, C# e monorepo não muda automaticamente com a retomada da equipe; qualquer revisão será uma nova decisão explícita.

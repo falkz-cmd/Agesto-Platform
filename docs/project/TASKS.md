@@ -12,10 +12,10 @@
 | Definir integrantes, papéis e focos iniciais | 🟢 Concluído — Davi (Produto), Depowo (Infra), ghzpro034 (Generalista) |
 | Criar organização GitHub e transferir para `Agesto-Platform/Agesto` | 🟢 Concluído |
 | Configurar time `Core`, acessos mínimos e segundo Owner | 🟢 Concluído — Davi e Depowo são Owners |
-| Proteger `develop` e `main` com PR, revisão e status checks | 🔴 Pendente |
+| Proteger `develop` e `main` com PR, revisão e status checks | 🟢 Concluído — ruleset `Protected branches` ativo |
 | Adicionar CI para backend, web e mobile | 🟢 Concluído — validado na promoção de governança |
 | Auditar `REQUIREMENTS.md` reconstruído | 🟡 Em andamento |
-| Publicar a linha local consolidada em `main` | 🟢 Concluído — merge `72b021b` |
+| Publicar a linha local consolidada em `main` | 🟢 Concluído — publicação inicial `72b021b`; governança atual `a201537` |
 
 ---
 
@@ -79,7 +79,7 @@
 
 ## Domínio Prestador de Serviço (KAN-69)
 
-> Épico que reúne os refinamentos do pivô de produto (DEC-15 a DEC-19, DEC-22, DEC-23): Orçamento, Agenda/Rota e item de atendimento genérico. As branches do batch já fazem parte da linha local atual de `develop`/`main`; a publicação desse histórico no GitHub ainda está pendente.
+> Épico que reúne os refinamentos do pivô de produto (DEC-15 a DEC-19, DEC-22, DEC-23): Orçamento, Agenda/Rota e item de atendimento genérico. O batch está publicado nas linhas `develop` e `main` de `Agesto-Platform/Agesto`.
 
 ### ✅ Concluídas
 
@@ -91,7 +91,7 @@
 | — | `Cliente.Endereco` (DEC-17, parte 1): campos `Logradouro`, `Numero`, `Bairro`, `Cidade`, `Cep` | Davi Gomes | `da828bc` |
 | — | Agendamento (DEC-17, parte 2): `Atendimento.DataAgendada` + `GET /api/atendimento/agenda` com filtro por perfil (Agente só a própria; Dono todas/filtra) via novo helper `TryGetPerfil` em `ApiControllerBase` | Davi Gomes | `7007361` |
 
-### 🟡 Batch "insights do protótipo" — concluído
+### ✅ Batch "insights do protótipo" — concluído
 
 > Lote de melhorias inspiradas no protótipo mobile aprovado, entregues após o batch principal do KAN-69, commit `5e82411`.
 
@@ -134,7 +134,6 @@
 | KAN-17 | Deploy inicial da API | Média | A definir |
 | KAN-18 | Documentar processo de deploy | Baixa | A definir |
 | KAN-54 | Agents de QA automatizados | Baixa | Diego |
-| — | Configurar rulesets em `develop` e `main` | Alta | Davi Gomes |
 | — | Instalar dotnet ef global na máquina | Média | Davi Gomes |
 | — | Aplicar migrations pendentes no novo PostgreSQL | Alta | A definir |
 | — | Subir banco/API real e trocar `VITE_USE_MOCKS`/`config.useMocks` para `false` no Web e no Mobile | Alta | Davi Gomes |
@@ -299,19 +298,18 @@ Tracking local (Jira offline); numeração `mob-0x`.
 
 ## Ordem de execução recomendada (próximas sprints)
 
-> O MVP possui backend, Web e Mobile funcionais contra mocks e publicados em `Agesto-Platform/Agesto`. Organização, time `Core`, CI e linha principal já estão configurados. Antes da infraestrutura, restam os rulesets, a auditoria documental e a formalização das responsabilidades e da propriedade intelectual. Depois disso, será provisionado um PostgreSQL novo, as migrations serão aplicadas em ambiente controlado e os clientes trocarão os mocks pela API real.
+> O MVP possui backend, Web e Mobile funcionais contra mocks e publicados em `Agesto-Platform/Agesto`. Organização, time `Core`, CI, linha principal e rulesets já estão configurados. Antes da infraestrutura, restam a auditoria documental e a formalização das responsabilidades e da propriedade intelectual. Depois disso, será provisionado um PostgreSQL novo, as migrations serão aplicadas em ambiente controlado e os clientes trocarão os mocks pela API real.
 
 ### Sprint imediata
-1. Configurar rulesets em `develop` e `main` com PR, revisão e status checks
-2. Concluir a auditoria de `REQUIREMENTS.md`
-3. Formalizar propriedade das contribuições e responsabilidades definitivas por módulo
-4. Depois da auditoria, remover a documentação legada em tarefa separada
-5. **Provisionar PostgreSQL novo e aplicar migrations pendentes** em ambiente controlado
-6. Subir a API real e desligar os mocks no Web e no Mobile
-7. Executar testes integrados com Web, Mobile, API e PostgreSQL reais
+1. Concluir a auditoria de `REQUIREMENTS.md`
+2. Formalizar propriedade das contribuições e responsabilidades definitivas por módulo
+3. Depois da auditoria, remover a documentação legada em tarefa separada
+4. **Provisionar PostgreSQL novo e aplicar migrations pendentes** em ambiente controlado
+5. Subir a API real e desligar os mocks no Web e no Mobile
+6. Executar testes integrados com Web, Mobile, API e PostgreSQL reais
 
 ### Sprint seguinte
-8. Débitos residuais: margem/hora do KAN-79 (após campo de duração), roteirização/lat-lng (DEC-17), descarga de Orçamento no sync, agenda na Carga do sync mobile, mapear uuid→id do cliente na Descarga mobile, paginação no `GetAllAsync`, lazy-load do Recharts e sincronização automática em background
+7. Débitos residuais: margem/hora do KAN-79 (após campo de duração), roteirização/lat-lng (DEC-17), descarga de Orçamento no sync, agenda na Carga do sync mobile, mapear uuid→id do cliente na Descarga mobile, paginação no `GetAllAsync`, lazy-load do Recharts e sincronização automática em background
 
 ---
 
